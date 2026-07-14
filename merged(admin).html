@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Live Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #020617;
+      --card-bg: rgba(15, 23, 42, 0.7);
+      --accent: #38bdf8;
+      --text-main: #f8fafc;
+      --text-dim: #94a3b8;
+      --border: rgba(255,255,255,0.1);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      background-image: radial-gradient(circle at 0% 0%, #1e293b 0%, transparent 50%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      position: sticky; top: 0; z-index: 50;
+      padding: 12px 16px;
+      background: rgba(2,6,23,0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .navLeft { display: flex; align-items: center; gap: 12px; }
+    .navBack {
+      font-size: 20px; cursor: pointer;
+      padding: 6px 10px; border-radius: 8px; display: none;
+      color: var(--accent);
+    }
+    .navBack:hover { background: #1e293b; }
+    .logoutBtn {
+      background: #dc2626; border: none;
+      padding: 7px 14px; border-radius: 8px;
+      color: #fff; cursor: pointer; font-weight: 700;
+    }
+
+    /* ===== FULL SCREEN OVERLAYS ===== */
+    .fullScreen {
+      position: fixed; inset: 0; background: var(--bg);
+      z-index: 999; display: flex; flex-direction: column; padding: 20px;
+    }
+    .scroll-area { flex: 1; overflow-y: auto; margin-top: 15px; padding-right: 5px; }
+
+    /* ===== AUTH BOX ===== */
+    .authBox {
+      background: var(--card-bg); border: 1px solid var(--border);
+      padding: 30px; border-radius: 24px;
+      width: 100%; max-width: 400px; margin: auto;
+      backdrop-filter: blur(20px);
+    }
+    .authBox h3 { margin-top: 0; text-align: center; color: var(--accent); }
+    input {
+      width: 100%; padding: 13px; margin: 8px 0;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border); border-radius: 12px;
+      color: white; outline: none; font-size: 15px;
+    }
+    input:focus { border-color: var(--accent); }
+    .btn-action {
+      width: 100%; padding: 13px;
+      background: var(--accent); color: white;
+      border: none; border-radius: 12px;
+      font-weight: 700; cursor: pointer; margin-top: 8px;
+    }
+
+    /* ===== TABS ===== */
+    .tabs {
+      display: flex; border-bottom: 1px solid var(--border);
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      flex: 1; min-width: fit-content;
+      text-align: center; padding: 12px 10px;
+      cursor: pointer; color: var(--text-dim);
+      font-weight: 600; white-space: nowrap;
+      font-size: 13px; position: relative;
+    }
+    .tab.active { color: var(--accent); }
+    .tab.active::after {
+      content: ""; position: absolute;
+      bottom: -1px; left: 25%; width: 50%;
+      height: 3px; background: var(--accent); border-radius: 6px;
+    }
+
+    /* ===== CARDS (Main course grid) ===== */
+    .courseGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 14px; padding: 14px;
+    }
+    @media(min-width:600px) {
+      .courseGrid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+    }
+    .card {
+      border: 1px solid var(--border); border-radius: 16px;
+      overflow: hidden; cursor: pointer;
+      background: var(--card-bg); transition: 0.2s; position: relative;
+    }
+    .card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+    .courseTitle { padding: 10px; font-size: 13px; font-weight: 600; }
+
+    /* ===== FOLDER (classic folderwise 1) ===== */
+    .folder {
+      margin: 10px; border: 1px solid var(--border);
+      border-radius: 14px; background: var(--card-bg);
+    }
+    .folderTitle { padding: 12px; font-weight: 700; border-bottom: 1px solid var(--border); }
+    .folderGrid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px;
+    }
+    @media(max-width:600px) { .folderGrid { grid-template-columns: 1fr; } }
+
+    /* ===== LIST ITEMS (allmainfen style - Folder Pro) ===== */
+    .list-item {
+      background: var(--card-bg); border: 1px solid var(--border);
+      padding: 14px; border-radius: 14px;
+      display: flex; align-items: center; gap: 14px;
+      cursor: pointer; margin-bottom: 10px; transition: 0.2s;
+    }
+    .list-item:hover { border-color: var(--accent); background: rgba(56,189,248,0.05); }
+    .meta-info { font-size: 11px; color: var(--text-dim); margin-top: 4px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .meta-badge { background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px; }
+
+    /* ===== SECTION HEADERS ===== */
+    .sectionHeader {
+      margin: 14px 12px 4px;
+      font-weight: 800; font-size: 15px;
+      color: var(--accent);
+    }
+
+    /* ===== VIDEO CARD ===== */
+    .videoCard {
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 13px; margin: 8px;
+      background: var(--card-bg); transition: 0.2s; cursor: pointer;
+    }
+    .videoCard:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+    /* ===== PLAYER ===== */
+    #player {
+      display: none; width: 100%; aspect-ratio: 16/9;
+      background: #000; margin: 10px 0;
+      border-radius: 14px; overflow: hidden; position: relative;
+    }
+    #player iframe, #player video {
+      width: 100%; height: 100%;
+      object-fit: contain; display: block; border: none;
+    }
+
+    /* ===== FOLDER PRO PLAYER (allmainfen) ===== */
+    #player-wrapper {
+      display: none; position: relative; width: 100%;
+      padding-top: 56.25%; background: #000;
+      border-radius: 16px; overflow: hidden; margin-bottom: 16px;
+    }
+    #player-wrapper iframe, #player-wrapper video {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
+    }
+    .close-player {
+      position: absolute; top: 10px; right: 10px;
+      background: rgba(0,0,0,0.6); color: white; border: none;
+      padding: 5px 12px; border-radius: 8px; cursor: pointer; z-index: 10;
+    }
+
+    /* ===== LOADER ===== */
+    #loader { text-align: center; padding: 30px; display: none; }
+    .spinner {
+      width: 30px; height: 30px;
+      border: 3px solid rgba(255,255,255,0.1);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 1s linear infinite; margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== LIVE TAG ===== */
+    .live-tag {
+      background: #ef4444; color: white;
+      padding: 12px 20px; border-radius: 14px;
+      font-weight: 800; display: inline-flex;
+      align-items: center; gap: 8px;
+      margin-bottom: 16px; cursor: pointer;
+    }
+
+    /* ===== BTN ===== */
+    .btn {
+      display: block; margin: 12px auto;
+      padding: 11px 20px; background: var(--accent);
+      border: none; border-radius: 10px;
+      font-weight: 700; cursor: pointer; color: #000;
+    }
+    .favAdd { background: linear-gradient(135deg,#22c55e,#16a34a); color:#fff; font-weight:700; border:none; padding:6px 12px; border-radius:8px; cursor:pointer; }
+    .favRemove { background: linear-gradient(135deg,#ef4444,#dc2626); color:#fff; font-weight:700; border:none; padding:6px 12px; border-radius:8px; cursor:pointer; }
+
+    /* ===== PURCHASED SECTION ===== */
+    .purchasedBadge {
+      position: absolute; top: 8px; right: 8px;
+      background: #22c55e; color: #fff;
+      font-size: 10px; font-weight: 800;
+      padding: 3px 8px; border-radius: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===== ACADEMY SELECT SCREEN ===== -->
+  <div id="academyScreen" class="fullScreen">
+    <h2 style="text-align:center;font-weight:800;margin-top:0">Select <span style="color:var(--accent)">Academy</span></h2>
+    <input id="academySearch" placeholder="🔍 Search Academy..." oninput="filterAcademies()" style="margin-bottom:0"/>
+    <div id="academyList" class="scroll-area"></div>
+  </div>
+
+  <!-- ===== LOGIN SCREEN ===== -->
+  <div id="loginScreen" class="fullScreen" style="display:none; justify-content:center; align-items:center;">
+    <div class="authBox">
+      <button onclick="backToAcademy()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-weight:700;margin-bottom:10px">← Change Academy</button>
+      <h3 id="selectedAcademyName">🔐 Login</h3>
+      <input id="mobileInput" placeholder="Mobile / Email" />
+      <input id="passInput" type="password" placeholder="Password (optional)" />
+      <div style="text-align:center;margin:10px 0;font-size:12px;opacity:0.5">OR</div>
+      <input id="tokenInput" placeholder="Enter Access Token" />
+      <input id="userInput" placeholder="UserID (default -2)" />
+      <button class="btn-action" onclick="saveLogin()">Login</button>
+      <button onclick="openOTPPage()" style="background:none;border:none;color:var(--text-dim);width:100%;margin-top:12px;cursor:pointer">Login with OTP</button>
+    </div>
+  </div>
+
+  <!-- ===== OTP SCREEN ===== -->
+  <div id="otpScreen" class="fullScreen" style="display:none; justify-content:center; align-items:center;">
+    <div class="authBox">
+      <h3>🔐 OTP Login</h3>
+      <input id="otpMobileInput" placeholder="Registered Mobile / Email" />
+      <button id="sendOtpBtn" class="btn-action" onclick="sendOTP()">📱 Send OTP</button>
+      <input id="otpCodeInput" placeholder="Enter 6-Digit OTP" />
+      <button class="btn-action" style="background:#16a34a" onclick="verifyOTP()">✅ Verify & Login</button>
+      <button class="btn-action" style="background:#475569" onclick="backToLogin()">⬅ Back</button>
+    </div>
+  </div>
+
+  <!-- ===== TOKEN POPUP ===== -->
+  <div id="tokenPopup" style="position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:9999">
+    <div style="background:#0f172a;padding:25px;border-radius:16px;border:1px solid var(--border);max-width:420px;width:90%;text-align:center">
+      <h3 style="margin-top:0;color:var(--accent)">✅ Login Successful</h3>
+      <div style="margin:12px 0;font-size:14px;opacity:0.8">Your Login Token</div>
+      <div style="background:#020617;border:1px solid var(--border);padding:10px;border-radius:8px;display:flex;gap:8px;align-items:center">
+        <input id="tokenDisplay" readonly style="flex:1;background:none;border:none;color:#fff;outline:none;font-size:12px;margin:0;padding:0"/>
+        <button onclick="copyToken()" style="background:var(--accent);border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-weight:600">Copy</button>
+      </div>
+      <button onclick="closeTokenPopup()" class="btn-action" style="margin-top:14px">Continue →</button>
+    </div>
+  </div>
+
+  <!-- ===== HEADER ===== -->
+  <div class="header">
+    <div class="navLeft">
+      <span id="navBack" class="navBack">←</span>
+      <span id="headerTitle">📂 All Courses</span>
+    </div>
+    <button class="logoutBtn" id="logoutBtn" onclick="logout()" style="display:none">🔓 Logout</button>
+  </div>
+
+  <!-- ===== HOME SCREEN ===== -->
+  <div id="homeScreen">
+    <!-- Favourites -->
+    <div id="favSection" class="folder" style="display:none;margin:12px">
+      <div class="folderTitle">⭐ Favourite Courses</div>
+      <div id="favList" class="courseGrid" style="padding:10px"></div>
+    </div>
+
+    <!-- Purchased / My Courses -->
+    <div id="purchasedSection" style="display:none">
+      <div class="sectionHeader">🎓 My Purchased Courses</div>
+      <div id="purchasedList" class="courseGrid"></div>
+    </div>
+
+    <!-- All Courses -->
+    <div id="allCourseSection">
+      <div class="sectionHeader">📚 All Courses</div>
+      <div id="courseList" class="courseGrid"></div>
+    </div>
+    <button class="btn" id="loadMoreCourses" onclick="loadCourses()">Load More Courses</button>
+  </div>
+
+  <!-- ===== COURSE VIEW ===== -->
+  <div id="courseView" style="display:none">
+    <!-- 4 Tabs: Live, Recorded, Folderwise (Classic), Folderwise Pro -->
+    <div class="tabs">
+      <div class="tab active" id="tLive"   onclick="showLive()">🔴 Live</div>
+      <div class="tab"        id="tRec"    onclick="showRec()">📼 Recorded</div>
+      <div class="tab"        id="tFolder" onclick="showFolder()">📁 Subjects</div>
+      <div class="tab"        id="tFolderPro" onclick="showFolderPro()">📂 Folders</div>
+    </div>
+
+    <!-- Classic player (Live/Recorded/Subjects tab) -->
+    <div id="player">
+      <video id="video" controls autoplay playsinline></video>
+    </div>
+
+    <!-- Folder Pro player (Folders tab) -->
+    <div id="player-wrapper" style="margin:10px">
+      <button class="close-player" onclick="closeProPlayer()">✕ Close</button>
+      <div id="player-host"></div>
+    </div>
+    <div id="custom-controls" style="display:none;margin-bottom:12px;text-align:center">
+      <button onclick="goFullScreen()" style="padding:10px 20px;background:var(--accent);border:none;border-radius:10px;font-weight:700;cursor:pointer;width:100%;max-width:300px">⛶ Full Screen</button>
+    </div>
+
+    <!-- Folder Pro live area -->
+    <div id="live-area" style="padding:10px"></div>
+
+    <!-- Loader -->
+    <div id="loader"><div class="spinner"></div></div>
+
+    <!-- Content area (classic tabs) -->
+    <div id="content"></div>
+    <button class="btn" id="loadMoreRec" style="display:none" onclick="loadMoreRecorded()">Load More Recorded</button>
+
+    <!-- Content grid (Folder Pro tab) -->
+    <div id="content-grid" style="padding:14px"></div>
+  </div>
+
+  <script>
+    /* ===== STATE ===== */
+    let TOKEN = localStorage.getItem("token") || "";
+    let USERID = localStorage.getItem("userid") || "-2";
+    let api_base = localStorage.getItem("api_base") || "";
+    let ALL_ACADEMIES = [];
+    let CURRENT_COURSE = null;
+    let hls = null;
+    let courseStart = 0;
+    let recStart = 0;
+    let favourites = JSON.parse(localStorage.getItem("favCourses") || "[]");
+    let lastScrollY = 0;
+    let manualCourses = [];
+
+    // FolderPro state
+    let navStack = [];
+    let currentCourseId = null;
+
+    const ACADEMY_JSON = "https://raw.githubusercontent.com/Aublic-sudo/okP/master/appxapis.json";
+    const PROXY_BASE = "https://appx-proxy.vercel.app/proxy?url=";
+    
+
+    const API_MAP = {
+      courses: ["/get/courselistnewv2?exam_id=&start={start}", "/get/courselist?start={start}", "/get/allcourse?start={start}"],
+      purchased: ["/get/mycoursev2?userid={uid}", "/get/get_all_purchases?userid={uid}&item_type=10"],
+      live: [
+        "/get/live_upcoming_course_classv2?start=-1&courseid={id}",
+        "/get/course_contents_by_live_status?course_id={id}&start=-1&live_status=1,2",
+        "/get/liveclasslist?course_id={id}"
+      ],
+      recorded: [
+        "/get/get_previous_live_videos?course_id={id}&start={start}&folder_wise_course=1&userid={uid}",
+        "/get/get_previous_live_videos?course_id={id}&start={start}&folder_wise_course=0&userid={uid}"
+      ],
+      player: [
+        "/get/fetchVideoDetailsById?course_id={id}&folder_wise_course=1&ytflag=0&video_id={vid}",
+        "/get/fetchVideoDetailsById?course_id={id}&folder_wise_course=0&ytflag=0&video_id={vid}",
+        "/get/fetchVideoDetailsById?course_id={id}&video_id={vid}&ytflag=0&folder_wise_course=0"
+      ],
+      folder_subject: ["/get/allsubjectfrmlivecourseclass?courseid={id}&start=-1"],
+      folder_topic: ["/get/alltopicfrmlivecourseclass?courseid={id}&subjectid={sid}&start=-1"],
+      folder_video: ["/get/livecourseclassbycoursesubtopconceptapiv3?topicid={tid}&start=-1&conceptid=&courseid={id}&subjectid={sid}"]
+    };
+
+    /* ===== UTILS ===== */
+    function getProxyUrl(url) { return PROXY_BASE + encodeURIComponent(url); }
+    function getHeaders() {
+  return {
+    Authorization: TOKEN,
+    "User-Agent": "okhttp/4.9.1",
+    "Accept-Encoding": "gzip,deflate",
+    "language": "en",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Client-Service": "Appx",
+    "Auth-Key": "appxapi",
+    "User-ID": USERID || "0",
+    "device-type": "android",   // ⭐ MOST IMPORTANT
+    "app-version": "1.0.0",     // optional but safe
+    "source": "android"
+  };
+}
+    function showLoader(s) { document.getElementById("loader").style.display = s ? "block" : "none"; }
+    function updateBreadcrumbs() {
+      document.getElementById("headerTitle").innerText = navStack.length ? navStack[navStack.length-1].name : (CURRENT_COURSE ? "Course" : "📂 All Courses");
+    }
+
+    /* ===== DECRYPT ===== */
+    function decrypt(enc) {
+      try {
+        enc = enc.split(":")[0];
+        const key = CryptoJS.enc.Utf8.parse("638udh3829162018");
+        const iv  = CryptoJS.enc.Utf8.parse("fedcba9876543210");
+        return CryptoJS.AES.decrypt({ ciphertext: CryptoJS.enc.Base64.parse(enc) }, key, { iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 }).toString(CryptoJS.enc.Utf8);
+      } catch(e) { return ""; }
+    }
+    function decryptPDF(enc, keyEnc) {
+      try {
+        const key = CryptoJS.enc.Utf8.parse("638udh3829162018");
+        const iv  = CryptoJS.enc.Utf8.parse("fedcba9876543210");
+        return CryptoJS.AES.decrypt({ ciphertext: CryptoJS.enc.Base64.parse(enc.split(":")[0]) }, key, { iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 }).toString(CryptoJS.enc.Utf8);
+      } catch(e) { return ""; }
+    }
+    function decode_base64(str) { try { return atob(str); } catch(e) { return ""; } }
+
+    /* ===== FETCH HELPERS ===== */
+    async function fetchMulti(endpoints) {
+      for (let url of endpoints) {
+        try {
+          const r = await fetch(url, { headers: getHeaders() });
+          const text = await r.text();
+          if (text.trim().startsWith("<")) continue;
+          const j = JSON.parse(text);
+          if (j && (j.data || j.status == 200)) return j;
+        } catch(e) {}
+      }
+      return {};
+    }
+    async function fetchMultiAll(endpoints) {
+      let finalData = [];
+      for (let url of endpoints) {
+        try {
+          const r = await fetch(url, { headers: getHeaders() });
+          const text = await r.text();
+          if (text.trim().startsWith("<")) continue;
+          const j = JSON.parse(text);
+          if (j?.data) finalData = finalData.concat(Array.isArray(j.data) ? j.data : [j.data]);
+        } catch(e) {}
+      }
+      return { data: finalData };
+    }
+
+    /* ===== ACADEMY ===== */
+    async function loadAcademies() {
+      const res = await fetch(ACADEMY_JSON);
+      ALL_ACADEMIES = await res.json();
+      renderAcademies(ALL_ACADEMIES);
+    }
+    function renderAcademies(list) {
+      const host = document.getElementById("academyList");
+      host.innerHTML = "";
+      list.slice(0, 200).forEach(a => {
+        const d = document.createElement("div");
+        d.className = "list-item";
+        d.innerHTML = `<div style="flex:1"><b>${a.name}</b></div><div style="color:var(--accent)">❯</div>`;
+        d.onclick = () => {
+          api_base = a.api;
+          document.getElementById("selectedAcademyName").innerText = a.name;
+          document.getElementById("academyScreen").style.display = "none";
+          document.getElementById("loginScreen").style.display = "flex";
+        };
+        host.appendChild(d);
+      });
+    }
+    function filterAcademies() {
+      const q = document.getElementById("academySearch").value.toLowerCase();
+      renderAcademies(ALL_ACADEMIES.filter(a => a.name.toLowerCase().includes(q)));
+    }
+
+    /* ===== AUTH ===== */
+    async function saveLogin() {
+      const t = document.getElementById("tokenInput").value.trim();
+      const uid = document.getElementById("userInput").value.trim();
+      if (t) {
+        TOKEN = t; USERID = uid || "-2";
+        localStorage.setItem("token", TOKEN); localStorage.setItem("userid", USERID); localStorage.setItem("api_base", api_base);
+        document.getElementById("loginScreen").style.display = "none";
+        showTokenPopup(TOKEN); startApp(); return;
+      }
+      const mobile = document.getElementById("mobileInput").value.trim();
+      const pass   = document.getElementById("passInput").value.trim();
+      if (mobile && pass) {
+        try {
+          const res = await fetch(`${api_base}/post/userLogin`, {
+            method: "POST",
+            headers: { "Auth-Key": "appxapi", "User-Id": "-2", "Content-Type": "application/x-www-form-urlencoded" },
+            body: `email=${mobile}&password=${pass}`
+          });
+          const j = await res.json();
+          if (j.status == 200) {
+            TOKEN = j.data.token; USERID = j.data.userid;
+            localStorage.setItem("token", TOKEN); localStorage.setItem("userid", USERID); localStorage.setItem("api_base", api_base);
+            document.getElementById("loginScreen").style.display = "none";
+            document.getElementById("logoutBtn").style.display = "block";
+            showTokenPopup(TOKEN); startApp(); return;
+          }
+          alert("Login Failed");
+        } catch(e) { alert("Login Error"); }
+        return;
+      }
+      alert("Enter Token OR Mobile + Password");
+    }
+    async function sendOTP() {
+      const mobile = document.getElementById("otpMobileInput").value.trim();
+      if (!mobile) return alert("Enter Mobile");
+      const btn = document.getElementById("sendOtpBtn");
+      btn.disabled = true; btn.innerText = "OTP Sent ✓";
+      try {
+        await fetch(`${api_base}/get/sendotp?phone=${mobile}`, { headers: { "Client-Service": "Appx", "Auth-Key": "appxapi", source: "website" } });
+      } catch(e) { btn.disabled = false; btn.innerText = "Send OTP"; }
+    }
+    async function verifyOTP() {
+      const mobile = document.getElementById("otpMobileInput").value.trim();
+      const otp    = document.getElementById("otpCodeInput").value.trim();
+      if (!mobile || !otp) return alert("Enter Mobile + OTP");
+      try {
+        const res = await fetch(`${api_base}/get/otpverify?useremail=${mobile}&otp=${otp}&device_id=WebBrowser17267591437616qmd1cxx313&mydeviceid=&mydeviceid2=`, { headers: { "Client-Service": "Appx", "Auth-Key": "appxapi", source: "website" } });
+        const j = await res.json();
+        if (j.status == 200) {
+          TOKEN = j.user.token; USERID = j.user.userid || "-2";
+          localStorage.setItem("token", TOKEN); localStorage.setItem("userid", USERID); localStorage.setItem("api_base", api_base);
+          document.getElementById("otpScreen").style.display = "none";
+          document.getElementById("loginScreen").style.display = "none";
+          document.getElementById("logoutBtn").style.display = "block";
+          showTokenPopup(TOKEN); startApp(); return;
+        }
+        alert("OTP Login Failed");
+      } catch(e) { alert("OTP Verify Error"); }
+    }
+    function showTokenPopup(token) { document.getElementById("tokenDisplay").value = token; document.getElementById("tokenPopup").style.display = "flex"; }
+    function copyToken() { document.getElementById("tokenDisplay").select(); document.execCommand("copy"); alert("Token copied ✅"); }
+    function closeTokenPopup() { document.getElementById("tokenPopup").style.display = "none"; }
+    function backToAcademy() { document.getElementById("loginScreen").style.display = "none"; document.getElementById("academyScreen").style.display = "flex"; }
+    function openOTPPage() { document.getElementById("loginScreen").style.display = "none"; document.getElementById("otpScreen").style.display = "flex"; }
+    function backToLogin() { document.getElementById("otpScreen").style.display = "none"; document.getElementById("loginScreen").style.display = "flex"; }
+
+    /* ===== LOGOUT ===== */
+    async function logout() {
+      if (!confirm("Logout? You'll need to login again.")) return;
+      TOKEN = ""; USERID = ""; api_base = "";
+      localStorage.removeItem("token"); localStorage.removeItem("userid"); localStorage.removeItem("api_base");
+      CURRENT_COURSE = null; currentCourseId = null; courseStart = 0; recStart = 0;
+      document.getElementById("courseList").innerHTML = "";
+      document.getElementById("favList").innerHTML = "";
+      document.getElementById("purchasedList").innerHTML = "";
+      document.getElementById("content").innerHTML = "";
+      document.getElementById("content-grid").innerHTML = "";
+      document.getElementById("courseView").style.display = "none";
+      document.getElementById("homeScreen").style.display = "block";
+      document.getElementById("favSection").style.display = "none";
+      document.getElementById("purchasedSection").style.display = "none";
+      document.getElementById("navBack").style.display = "none";
+      document.getElementById("headerTitle").innerText = "📂 All Courses";
+      document.getElementById("logoutBtn").style.display = "none";
+      if (hls) { hls.destroy(); hls = null; }
+      window.scrollTo(0, 0);
+      await loadAcademies();
+      document.getElementById("academyScreen").style.display = "flex";
+    }
+
+    /* ===== LOAD COURSES ===== */
+    async function loadCourses() {
+      const j = await fetchMultiAll(API_MAP.courses.map(e => api_base + e.replace("{start}", courseStart)));
+      if (!j.data?.length) { document.getElementById("loadMoreCourses").style.display = "none"; return; }
+      j.data.forEach(c => renderCourse(c, document.getElementById("courseList")));
+      courseStart += j.data.length;
+      updateFavSection();
+    }
+
+    /* ===== LOAD PURCHASED ===== */
+    async function loadPurchased() {
+      const purchasedList = document.getElementById("purchasedList");
+      purchasedList.innerHTML = "";
+      document.getElementById("purchasedSection").style.display = "none";
+      try {
+        const j = await fetchMultiAll(API_MAP.purchased.map(e => api_base + e.replace("{uid}", USERID)));
+        const courses = j.data || [];
+        if (!courses.length) return;
+        document.getElementById("purchasedSection").style.display = "block";
+        courses.forEach(c => {
+          const courseObj = { id: c.id || c.item_id, course_name: c.course_name || c.title, course_thumbnail: c.course_thumbnail };
+          const thumb = courseObj.course_thumbnail || "https://via.placeholder.com/600x300?text=No+Image";
+          const d = document.createElement("div");
+          d.className = "card";
+          d.innerHTML = `<img class="thumb" src="${thumb}"><span class="purchasedBadge">✓ Purchased</span><div class="courseTitle">${courseObj.course_name}</div>`;
+          d.onclick = () => openCourse(courseObj);
+          purchasedList.appendChild(d);
+        });
+      } catch(e) { console.log("Purchased error", e); }
+    }
+
+    /* ===== RENDER COURSE CARD ===== */
+    function renderCourse(c, target) {
+      const isFav = favourites.some(f => f.id === c.id);
+      const thumb = c.course_thumbnail || "https://via.placeholder.com/600x300?text=No+Image";
+      const d = document.createElement("div");
+      d.className = "card";
+      d.innerHTML = `
+        <img class="thumb" src="${thumb}">
+        <div style="position:absolute;top:8px;left:8px;background:#0008;padding:3px 7px;border-radius:5px;font-size:11px;font-weight:700">ID:${c.id}</div>
+        <button class="${isFav ? 'favRemove' : 'favAdd'}" style="position:absolute;top:8px;right:8px">${isFav ? "★ Saved" : "☆ Save"}</button>
+        <div class="courseTitle">${c.course_name}</div>`;
+      d.querySelector("button").onclick = e => { e.stopPropagation(); isFav ? removeFav(e, c.id) : addFav(e, c.id, c.course_name, thumb); };
+      d.onclick = () => openCourse(c);
+      target.appendChild(d);
+    }
+
+    /* ===== FAVOURITES ===== */
+    function addFav(e, id, course_name, course_thumbnail) {
+      e.stopPropagation();
+      favourites.push({ id, course_name, course_thumbnail });
+      localStorage.setItem("favCourses", JSON.stringify(favourites));
+      updateFavSection();
+    }
+    function removeFav(e, id) {
+      if (e) e.stopPropagation();
+      favourites = favourites.filter(f => f.id !== id);
+      localStorage.setItem("favCourses", JSON.stringify(favourites));
+      updateFavSection();
+    }
+    function updateFavSection() {
+  const favList = document.getElementById("favList");
+  favList.innerHTML = "";
+  if (!favourites.length) { document.getElementById("favSection").style.display = "none"; return; }
+  document.getElementById("favSection").style.display = "block";
+  favourites.forEach(c => {
+    const thumb = c.course_thumbnail || "https://via.placeholder.com/600x300?text=No+Image";
+    const d = document.createElement("div");
+    d.className = "card";
+    d.innerHTML = `
+      <img class="thumb" src="${thumb}">
+      <div class="courseTitle">${c.course_name}</div>
+      <button class="favRemove" style="position:absolute;top:8px;right:8px;z-index:2">✕ Remove</button>
+    `;
+    // Button pe alag listener — stopPropagation reliable tarike se
+    d.querySelector("button").addEventListener("click", function(e) {
+      e.stopPropagation();
+      favourites = favourites.filter(f => String(f.id) !== String(c.id));
+      localStorage.setItem("favCourses", JSON.stringify(favourites));
+      updateFavSection();
+    });
+    d.onclick = () => openCourse(c);
+    favList.appendChild(d);
+  });
+}
+
+    /* ===== OPEN / BACK COURSE ===== */
+    function openCourse(c) {
+      lastScrollY = window.scrollY;
+      CURRENT_COURSE = c.id;
+      currentCourseId = c.id;
+      navStack = [];
+      document.getElementById("headerTitle").innerText = c.course_name;
+      document.getElementById("navBack").style.display = "block";
+      document.getElementById("homeScreen").style.display = "none";
+      document.getElementById("courseView").style.display = "block";
+      document.getElementById("content").innerHTML = "";
+      document.getElementById("content-grid").innerHTML = "";
+      document.getElementById("player").style.display = "none";
+      document.getElementById("live-area").innerHTML = "";
+      showLive();
+    }
+    function goBack() {
+      // If inside FolderPro navigation
+      if (document.getElementById("tFolderPro").classList.contains("active") && navStack.length > 0) {
+        navStack.pop();
+        if (navStack.length == 0) { loadInitialFolderPro(); }
+        else { const prev = navStack[navStack.length-1]; fetchFolders(prev.id, prev.name); }
+        return;
+      }
+      CURRENT_COURSE = null; currentCourseId = null; navStack = [];
+      document.getElementById("headerTitle").innerText = "📂 All Courses";
+      document.getElementById("courseView").style.display = "none";
+      document.getElementById("homeScreen").style.display = "block";
+      document.getElementById("navBack").style.display = "none";
+      document.getElementById("content").innerHTML = "";
+      document.getElementById("content-grid").innerHTML = "";
+      document.getElementById("live-area").innerHTML = "";
+      document.getElementById("player").innerHTML = '<video id="video" controls autoplay playsinline></video>';
+      const vid = document.getElementById("video");
+      if (vid) { vid.pause(); vid.src = ""; }
+      if (hls) { hls.destroy(); hls = null; }
+      document.getElementById("player").style.display = "none";
+      closeProPlayer();
+      document.getElementById("purchasedSection").style.display = "block";
+      setTimeout(() => window.scrollTo({ top: lastScrollY, behavior: "instant" }), 50);
+    }
+    document.getElementById("navBack").onclick = () => goBack();
+
+    /* ===== TABS ===== */
+    function setActiveTab(id) {
+      ["tLive","tRec","tFolder","tFolderPro"].forEach(t => document.getElementById(t).classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+      // Show/hide player wrapper based on tab
+      if (id === "tFolderPro") {
+        document.getElementById("content").style.display = "none";
+        document.getElementById("loadMoreRec").style.display = "none";
+        document.getElementById("player").style.display = "none";
+        document.getElementById("content-grid").style.display = "";
+      } else {
+        document.getElementById("content-grid").innerHTML = "";
+        document.getElementById("content-grid").style.display = "none";
+        document.getElementById("content").style.display = "";
+        closeProPlayer();
+        document.getElementById("live-area").innerHTML = "";
+      }
+    }
+
+    /* ===== TAB: LIVE ===== */
+    async function showLive() {
+      setActiveTab("tLive");
+      document.getElementById("loadMoreRec").style.display = "none";
+      const j = await fetchMultiAll(API_MAP.live.map(e => api_base + e.replace("{id}", CURRENT_COURSE)));
+      const content = document.getElementById("content");
+      content.innerHTML = "";
+      let liveList = [], upcomingList = [];
+      if (Array.isArray(j.data)) {
+        j.data.forEach(obj => {
+          if (obj.live && Array.isArray(obj.live)) liveList = liveList.concat(obj.live);
+          if (obj.upcoming && Array.isArray(obj.upcoming)) upcomingList = upcomingList.concat(obj.upcoming);
+          if (obj.material_type || obj.Title) liveList.push(obj);
+        });
+      }
+      if (liveList.length) {
+        liveList.forEach(v => {
+          const d = document.createElement("div");
+          d.className = "videoCard";
+          d.innerHTML = `🔴 <b>${v.Title}</b><br><small>${v.date_and_time||""}</small>`;
+          if (v.recording_schedule) d.onclick = () => playLive(v.recording_schedule);
+          content.appendChild(d);
+        });
+        return;
+      }
+      if (upcomingList.length) {
+        upcomingList.forEach(v => {
+          const d = document.createElement("div");
+          d.className = "videoCard";
+          d.innerHTML = `🕒 <b>${v.Title}</b><br><span style="color:var(--accent);font-weight:600">Live on: ${v.date_and_time}</span>`;
+          d.style.cursor = "default";
+          content.appendChild(d);
+        });
+        return;
+      }
+      content.innerHTML = "<p style='padding:15px;opacity:0.6;text-align:center'>No live class right now</p>";
+    }
+
+    /* ===== TAB: RECORDED ===== */
+    async function showRec() {
+      setActiveTab("tRec");
+      const content = document.getElementById("content");
+      content.innerHTML = "";
+      recStart = 0;
+      document.getElementById("loadMoreRec").style.display = "block";
+      await loadMoreRecorded();
+    }
+    async function loadMoreRecorded() {
+      const j = await fetchMultiAll(API_MAP.recorded.map(e => api_base + e.replace("{id}", CURRENT_COURSE).replace("{start}", recStart).replace("{uid}", USERID)));
+      if (!j.data || !j.data.length) { document.getElementById("loadMoreRec").style.display = "none"; return; }
+      j.data.sort((a,b) => b.strtotime - a.strtotime);
+      const content = document.getElementById("content");
+      j.data.forEach(v => {
+        const d = document.createElement("div");
+        d.className = "videoCard";
+        d.style.cssText = "display:flex;justify-content:space-between;align-items:center";
+        d.innerHTML = `<div style="flex:1"><b>🎬 ${v.Title}</b><br><small>${v.date_and_time||""}</small></div><button class="btn" style="margin:0;padding:6px 12px;font-size:12px" onclick="downloadVideo(event,${v.id})">⬇</button>`;
+        d.onclick = () => playRecorded(v.id);
+        content.appendChild(d);
+      });
+      recStart += j.data.length;
+    }
+
+    /* ===== TAB: SUBJECTS (Classic Folderwise) ===== */
+    async function showFolder() {
+  setActiveTab("tFolder");
+
+  const content = document.getElementById("content");
+  content.innerHTML = "<div class='spinner' style='margin:30px auto'></div>";
+
+  try {
+    const r = await fetch(
+      api_base + API_MAP.folder_subject[0].replace("{id}", CURRENT_COURSE),
+      { headers: getHeaders() }
+    );
+
+    const j = await r.json();
+
+    content.innerHTML = "";
+
+    if (!j.data?.length) {
+      content.innerHTML =
+        "<p style='padding:15px;opacity:0.6;text-align:center'>No subjects available</p>";
+      return;
+    }
+
+    // 🔥 DOWNLOAD BOX (WITH PROGRESS)
+    const downloadBox = document.createElement("div");
+    downloadBox.style.cssText = `
+      margin: 15px;
+      padding: 15px;
+      background: rgba(15,23,42,0.8);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    `;
+
+    const dumpBtn = document.createElement("button");
+    dumpBtn.className = "btn";
+    dumpBtn.innerText = "🔥 Full Course TXT";
+
+    const progress = document.createElement("div");
+    progress.style.cssText = `
+      width:100%;
+      height:10px;
+      background:#1e293b;
+      border-radius:10px;
+      overflow:hidden;
+    `;
+
+    const progressInner = document.createElement("div");
+    progressInner.style.cssText = `
+      height:100%;
+      width:0%;
+      background:#38bdf8;
+      transition:0.3s;
+    `;
+
+    progress.appendChild(progressInner);
+
+    const progressText = document.createElement("div");
+    progressText.style.fontSize = "12px";
+    progressText.style.opacity = "0.7";
+    progressText.innerText = "Ready";
+
+    downloadBox.appendChild(dumpBtn);
+    downloadBox.appendChild(progress);
+    downloadBox.appendChild(progressText);
+
+    content.appendChild(downloadBox);
+
+    // 🔥 TEXT FIX
+    function fixText(str) {
+      try {
+        return decodeURIComponent(escape(str));
+      } catch {
+        return str;
+      }
+    }
+
+    // 🔥 FULL DUMP WITH PROGRESS
+    dumpBtn.onclick = async () => {
+
+      showLoader(true);
+
+      let txt = "";
+      let count = 0;
+
+      try {
+        const subjects = j.data || [];
+
+        // 🔢 total estimation
+        let total = subjects.length * 10; // approx (topics unknown)
+
+        for (let subject of subjects) {
+
+          txt += `\n\n📚 SUBJECT: ${fixText(subject.subject_name)}\n\n`;
+
+          const topicRes = await fetch(
+            api_base + API_MAP.folder_topic[0]
+              .replace("{id}", CURRENT_COURSE)
+              .replace("{sid}", subject.subjectid),
+            { headers: getHeaders() }
+          );
+
+          const topicJson = await topicRes.json();
+          const topics = topicJson.data || [];
+
+          for (let topic of topics) {
+
+            txt += `\n📖 TOPIC: ${fixText(topic.topic_name)}\n`;
+
+            const videoRes = await fetch(
+              api_base + API_MAP.folder_video[0]
+                .replace("{id}", CURRENT_COURSE)
+                .replace("{sid}", subject.subjectid)
+                .replace("{tid}", topic.topicid),
+              { headers: getHeaders() }
+            );
+
+            const videoJson = await videoRes.json();
+            const videos = videoJson.data || [];
+
+            for (let v of videos) {
+
+              let videoUrl = "";
+              let pdfUrl = "";
+
+              try {
+                const enc = v.download_link || v.download_links?.[0]?.path;
+                if (enc) videoUrl = decrypt(enc);
+              } catch {}
+
+              try {
+                const pdfEnc = v.pdf_link || v.pdf_link2 || "";
+                const pdfKey = v.pdf_encryption_key || v.pdf2_encryption_key || "";
+
+                pdfUrl = decryptPDF(pdfEnc, pdfKey);
+
+                if (!pdfUrl || !pdfUrl.startsWith("http")) {
+                  pdfUrl = atob(pdfEnc.split(":")[0]).trim();
+                }
+
+              } catch {}
+
+              if (videoUrl && videoUrl.startsWith("http")) {
+                txt += `🎬 ${fixText(v.Title)} : ${videoUrl}\n`;
+              }
+
+              if (pdfUrl && pdfUrl.startsWith("http")) {
+                txt += `📄 ${fixText(v.Title)} : ${pdfUrl}\n`;
+              }
+
+              // 🔥 PROGRESS UPDATE
+              count++;
+              let percent = Math.min(100, Math.floor((count / total) * 100));
+              progressInner.style.width = percent + "%";
+              progressText.innerText = `Processing... ${percent}%`;
+            }
+          }
+        }
+
+        if (!txt) return alert("No data found ❌");
+
+        const blob = new Blob([txt], {
+          type: "text/plain;charset=utf-8"
+        });
+
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "FULL_COURSE.txt";
+        a.click();
+
+        progressText.innerText = "✅ Done";
+
+      } catch (e) {
+        console.log("Dump error:", e);
+        alert("Error generating TXT ❌");
+      }
+
+      showLoader(false);
+    };
+
+    // 🔽 ORIGINAL SUBJECT UI (UNCHANGED)
+    j.data.forEach(subject => {
+      const box = document.createElement("div");
+      box.className = "folder";
+
+      box.innerHTML = `
+        <div class="folderTitle">📚 ${fixText(subject.subject_name)}</div>
+        <div class="folderGrid" id="grid_${subject.subjectid}"></div>
+      `;
+
+      content.appendChild(box);
+
+      fetch(
+        api_base + API_MAP.folder_topic[0]
+          .replace("{id}", CURRENT_COURSE)
+          .replace("{sid}", subject.subjectid),
+        { headers: getHeaders() }
+      )
+        .then(r => r.json())
+        .then(j2 => {
+          const grid = document.getElementById(`grid_${subject.subjectid}`);
+
+          if (!j2.data?.length) {
+            grid.innerHTML =
+              "<p style='padding:10px;font-size:12px;opacity:0.6'>No topics</p>";
+            return;
+          }
+
+          j2.data.forEach(topic => {
+            const tc = document.createElement("div");
+            tc.className = "videoCard";
+            tc.innerHTML = `📖 ${fixText(topic.topic_name)}`;
+            tc.onclick = () =>
+              openTopic(
+                subject.subjectid,
+                topic.topicid,
+                subject.subject_name,
+                topic.topic_name
+              );
+            grid.appendChild(tc);
+          });
+        });
+    });
+
+  } catch (e) {
+    content.innerHTML = "<p style='padding:15px'>Error loading subjects</p>";
+  }
+}
+    async function openTopic(subjectId, topicId, subjectName, topicName) {
+      const content = document.getElementById("content");
+      content.innerHTML = `<div style="padding:12px"><div class="folder"><div class="folderTitle" id="topicBack" style="cursor:pointer">← Back to ${subjectName}</div></div><div class="folder"><div class="folderTitle">📖 ${topicName}</div><div id="topicVideos" class="folderGrid"></div></div></div>`;
+      document.getElementById("topicBack").onclick = () => showFolder();
+      const vc = document.getElementById("topicVideos");
+      try {
+        const r = await fetch(api_base + API_MAP.folder_video[0].replace("{id}", CURRENT_COURSE).replace("{sid}", subjectId).replace("{tid}", topicId), { headers: getHeaders() });
+        const j = await r.json();
+        if (!j.data?.length) { vc.innerHTML = "<p style='padding:10px;font-size:12px'>No videos</p>"; return; }
+        j.data.forEach(v => {
+  const d = document.createElement("div");
+  d.className = "videoCard";
+
+  const pdfEnc = v.pdf_link || v.pdf_link2 || "";
+  const pdfKeyEnc = v.pdf_encryption_key || v.pdf2_encryption_key || "";
+  const hasPdf = pdfEnc && typeof pdfEnc === "string" && pdfEnc.includes(":");
+
+  d.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+      <span>🎬 ${v.Title}</span>
+      ${hasPdf ? `<button class="btn" id="pdf_${v.id}" style="margin:0;padding:5px 10px;font-size:12px">📄 PDF</button>` : ""}
+    </div>
+  `;
+
+  // 🎬 video click
+  d.onclick = () => playRecorded(v.id);
+
+  // ✅ YAHI DALNA HAI (tera code)
+  const btn = d.querySelector(`#pdf_${v.id}`);
+  if (btn) {
+    btn.addEventListener("click", function(e) {
+      e.stopPropagation();
+
+      let rawUrl = "";
+
+      try {
+        rawUrl = decryptPDF(pdfEnc, pdfKeyEnc);
+
+        if (!rawUrl || !rawUrl.startsWith("http")) {
+          rawUrl = atob(pdfEnc.split(":")[0]).trim();
+        }
+
+      } catch(e) {
+        rawUrl = atob(pdfEnc.split(":")[0]).trim();
+      }
+
+      console.log("PDF URL:", rawUrl);
+
+      if (!rawUrl) {
+        alert("PDF open nahi ho raha ❌");
+        return;
+      }
+
+      window.open(
+        `https://website.cloud-front.in/pdfjs/web/viewer.html?file=${rawUrl}`,
+        "_blank"
+      );
+    });
+  }
+
+  // 👉 LAST me append
+  vc.appendChild(d);
+});
+      } catch(e) { vc.innerHTML = "<p>Error loading videos</p>"; }
+    }
+
+    /* ===== TAB: FOLDER PRO (allmainfen logic) ===== */
+    function showFolderPro() {
+      setActiveTab("tFolderPro");
+      navStack = [];
+      loadInitialFolderPro();
+    }
+    async function loadInitialFolderPro() {
+      showLoader(true);
+      const grid = document.getElementById("content-grid");
+      grid.innerHTML = "";
+      document.getElementById("live-area").innerHTML = "";
+      // Check live classes
+      checkLiveClasses(CURRENT_COURSE);
+      // Load folders from root
+      await fetchFolders("-1", document.getElementById("headerTitle").innerText);
+      showLoader(false);
+    }
+    
+    async function checkLiveClasses(courseId) {
+      const area = document.getElementById("live-area");
+      try {
+        const res = await fetch(`${api_base}/get/live_upcoming_course_classv2?start=-1&courseid=${courseId}`, { headers: getHeaders() });
+        const j = await res.json();
+        if (j.data?.[0]?.live?.length) {
+          const live = j.data[0].live[0];
+          const tag = document.createElement("div");
+          tag.className = "live-tag";
+          tag.innerHTML = `🔴 LIVE: ${live.Title}`;
+          tag.onclick = () => playLiveInPro(live.recording_schedule);
+          area.appendChild(tag);
+        }
+      } catch(e) {}
+    }
+async function fetchFolders(parentId, title) {
+  showLoader(true);
+  closeProPlayer();
+
+  const grid = document.getElementById("content-grid");
+  grid.innerHTML = "";
+
+  document.getElementById("headerTitle").innerText = title;
+
+  let start = -1, allData = [];
+
+  // 🔥 TEXT FIX FUNCTION
+  function fixText(str) {
+    try {
+      return decodeURIComponent(escape(str));
+    } catch {
+      return str;
+    }
+  }
+
+  try {
+    while (true) {
+      const res = await fetch(`${api_base}/get/folder_contentsv3?start=${start}&course_id=${currentCourseId}&parent_id=${parentId}`, {
+        headers: getHeaders()
+      });
+
+      const result = await res.json();
+
+      if (!result.data || !result.data.length) break;
+
+      allData = allData.concat(result.data);
+
+      if (result.data.length < 20) break;
+
+      start += 20;
+    }
+
+    // 🔥 BUTTON UI BOX
+    if (allData.length > 0) {
+
+      const downloadBox = document.createElement("div");
+      downloadBox.style.cssText = `
+        margin: 15px;
+        padding: 15px;
+        background: rgba(15,23,42,0.8);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      `;
+
+      const btnRow = document.createElement("div");
+      btnRow.style.display = "flex";
+      btnRow.style.gap = "10px";
+
+      const videoBtn = document.createElement("button");
+      videoBtn.className = "btn";
+      videoBtn.innerText = "🎬 Video TXT";
+
+      const pdfBtn = document.createElement("button");
+      pdfBtn.className = "btn";
+      pdfBtn.innerText = "📄 PDF TXT";
+
+      // 🔥 PROGRESS BAR
+      const progress = document.createElement("div");
+      progress.style.cssText = `
+        width:100%;
+        height:10px;
+        background:#1e293b;
+        border-radius:10px;
+        overflow:hidden;
+      `;
+
+      const progressInner = document.createElement("div");
+      progressInner.style.cssText = `
+        height:100%;
+        width:0%;
+        background:#38bdf8;
+        transition:0.3s;
+      `;
+
+      progress.appendChild(progressInner);
+
+      const progressText = document.createElement("div");
+      progressText.style.fontSize = "12px";
+      progressText.style.opacity = "0.7";
+      progressText.innerText = "Ready";
+
+      btnRow.appendChild(videoBtn);
+      btnRow.appendChild(pdfBtn);
+
+      downloadBox.appendChild(btnRow);
+      downloadBox.appendChild(progress);
+      downloadBox.appendChild(progressText);
+
+      grid.appendChild(downloadBox);
+
+      // 🎬 VIDEO DOWNLOAD
+      videoBtn.onclick = async () => {
+        let txt = "";
+        let count = 0;
+        let videos = allData.filter(x => x.material_type === "VIDEO");
+        let total = videos.length;
+
+        for (let item of videos) {
+
+          let url = "";
+
+          try {
+            const res = await fetch(`${api_base}/get/fetchVideoDetailsById?course_id=${currentCourseId}&folder_wise_course=1&ytflag=0&video_id=${item.id}`, {
+              headers: getHeaders()
+            });
+
+            const j = await res.json();
+            const data = j.data;
+
+            if (data?.encrypted_links?.length) {
+              let video = data.encrypted_links.find(v => v.quality === "720p");
+              if (!video) continue;
+              url = decrypt(video.path);
+            }
+
+          } catch(e) {}
+
+          if (url && url.startsWith("http")) {
+            txt += `${fixText(item.Title)} : ${url}\n\n`;
+          }
+
+          count++;
+          let percent = Math.floor((count / total) * 100);
+          progressInner.style.width = percent + "%";
+          progressText.innerText = `Processing ${count}/${total} (${percent}%)`;
+        }
+
+        if (!txt) return alert("No video links ❌");
+
+        const blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
+        const a = document.createElement("a");
+
+        a.href = URL.createObjectURL(blob);
+        a.download = title + "_video.txt";
+        a.click();
+
+        progressText.innerText = "✅ Done";
+      };
+
+      // 📄 PDF DOWNLOAD
+      pdfBtn.onclick = async () => {
+        let txt = "";
+        let count = 0;
+        let pdfs = allData.filter(x => x.material_type === "PDF");
+        let total = pdfs.length;
+
+        for (let item of pdfs) {
+
+          let url = "";
+
+          try {
+            url = decryptPDF(item.pdf_link, item.pdf_encryption_key);
+
+            if (!url || !url.startsWith("http")) {
+              url = atob(item.pdf_link.split(":")[0]).trim();
+            }
+
+          } catch {
+            url = atob(item.pdf_link.split(":")[0]).trim();
+          }
+
+          if (url && url.startsWith("http")) {
+            txt += `${fixText(item.Title)} : ${url}\n\n`;
+          }
+
+          count++;
+          let percent = Math.floor((count / total) * 100);
+          progressInner.style.width = percent + "%";
+          progressText.innerText = `Processing ${count}/${total} (${percent}%)`;
+        }
+
+        if (!txt) return alert("No PDF links ❌");
+
+        const blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
+        const a = document.createElement("a");
+
+        a.href = URL.createObjectURL(blob);
+        a.download = title + "_pdf.txt";
+        a.click();
+
+        progressText.innerText = "✅ Done";
+      };
+
+      // 🔽 ITEMS UI (same tera original)
+      allData.forEach(item => {
+
+        const row = document.createElement("div");
+        row.className = "list-item";
+
+        const icon = item.material_type == "FOLDER" ? "📁" :
+                     item.material_type == "PDF" ? "📄" : "🎬";
+
+        let metaHtml = "";
+
+        if (item.material_type == "FOLDER") {
+          metaHtml = `<span class="meta-badge">🎬 ${item.videos_count||0}</span>
+                      <span class="meta-badge">📄 ${item.files_count||0}</span>`;
+        } 
+        else if (item.material_type == "VIDEO") {
+          metaHtml = `<span class="meta-badge">⏳ ${item.duration||'N/A'}</span>
+                      <span class="meta-badge">📅 ${item.date_and_time||item.created_at||'No Date'}</span>`;
+        }
+
+        row.innerHTML = `
+          <div style="font-size:22px">${icon}</div>
+          <div style="flex:1">
+            <b>${fixText(item.Title)}</b>
+            <div class="meta-info">
+              ${metaHtml}
+              <span style="opacity:0.4">ID:${item.id}</span>
+            </div>
+          </div>
+        `;
+
+        if (item.material_type == "FOLDER") {
+          row.onclick = () => {
+            navStack.push({ type:"FOLDER", id: item.id, name: item.Title });
+            fetchFolders(item.id, item.Title);
+          };
+        } 
+        else if (item.material_type == "VIDEO") {
+          row.onclick = () => playVideoInPro(item.id);
+        } 
+        else if (item.material_type == "PDF") {
+          row.onclick = () => {
+            const rawUrl = decryptPDF(item.pdf_link, item.pdf_encryption_key);
+            window.open(`https://website.cloud-front.in/pdfjs/web/viewer.html?file=${encodeURIComponent(rawUrl)}`, "_blank");
+          };
+        }
+
+        grid.appendChild(row);
+      });
+
+    } else {
+      grid.innerHTML = `<p style="text-align:center;width:100%;padding:40px;opacity:0.5">📂 Empty Folder</p>`;
+    }
+
+  } catch(e) {
+    console.log("Main error:", e);
+  }
+
+  showLoader(false);
+}
+
+    /* ===== PLAYERS ===== */
+    function playLive(id) {
+      const player = document.getElementById("player");
+      player.style.display = "block";
+      if (hls) hls.destroy();
+      hls = new Hls({ lowLatencyMode: true });
+      hls.loadSource(`https://liveclasses.cloud-front.in/live/${id}_480p.m3u8?request_llhls=1`);
+      const vid = document.getElementById("video");
+      hls.attachMedia(vid); vid.play();
+    }
+    async function playRecorded(videoId) {
+      try {
+        const j = await fetchMultiAll(API_MAP.player.map(e => api_base + e.replace("{id}", CURRENT_COURSE).replace("{vid}", videoId)));
+        if (!j?.data) { alert("Video data not found"); return; }
+        const data = Array.isArray(j.data) ? j.data[0] : j.data;
+        if (hls) { hls.destroy(); hls = null; }
+        const player = document.getElementById("player");
+        if (data.video_player_url && data.video_player_token) {
+          player.innerHTML = `<iframe src="${data.video_player_url+data.video_player_token}" allow="autoplay;fullscreen;picture-in-picture" allowfullscreen></iframe>`;
+          player.style.display = "block"; return;
+        }
+        if (data.download_links?.length || data.download_link) {
+          const enc = data.download_links?.[0]?.path || data.download_link;
+          const realLink = decrypt(enc).trim().replace(/\s/g, "");
+          const vid = document.getElementById("video");
+          player.style.display = "block";
+          if (Hls.isSupported()) {
+            hls = new Hls({ lowLatencyMode: true });
+            hls.loadSource(getProxyUrl(realLink)); hls.attachMedia(vid); vid.play().catch(()=>{});
+          }
+          return;
+        }
+        if (data.encrypted_links?.length) {
+          const obj = data.encrypted_links[0];
+          let k2 = decode_base64(decrypt(obj.key)), da = decrypt(obj.path);
+          player.innerHTML = `<iframe src="https://appx-play.classx.co.in/combined-img-player?isMobile=true&videoPlayer=hls&urls=${encodeURIComponent(da)}&key=${encodeURIComponent(k2)}" allow="autoplay;fullscreen;picture-in-picture" allowfullscreen></iframe>`;
+          player.style.display = "block";
+        }
+      } catch(e) { console.log(e); }
+    }
+    async function downloadVideo(e, vid) {
+      e.stopPropagation();
+      const j = await fetchMulti(API_MAP.player.map(ep => api_base + ep.replace("{id}", CURRENT_COURSE).replace("{vid}", vid)));
+      const data = j.data;
+      if (!data) { alert("Video details not found"); return; }
+      try {
+        const enc = data.download_links?.[0]?.path || data.download_link;
+        if (!enc) { alert("Download link missing"); return; }
+        window.open(decrypt(enc), "_blank");
+      } catch(err) { alert("Download Error ❌"); }
+    }
+
+    // FolderPro players
+    function playLiveInPro(id) {
+      document.getElementById("player-wrapper").style.display = "block";
+      setupHLS(`https://liveclasses.cloud-front.in/live/${id}_480p.m3u8`);
+    }
+    async function playVideoInPro(vidId) {
+      const host = document.getElementById("player-host");
+      document.getElementById("player-wrapper").style.display = "block";
+      document.getElementById("custom-controls").style.display = "block";
+      host.innerHTML = `<div class="spinner" style="margin-top:20%"></div>`;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      try {
+        const res = await fetch(`${api_base}/get/fetchVideoDetailsById?course_id=${currentCourseId}&folder_wise_course=1&ytflag=0&video_id=${vidId}`, { headers: getHeaders() });
+        const j = await res.json();
+        const data = j.data;
+        if (!data) { host.innerHTML = "No video data"; return; }
+        if (data.video_player_url && data.video_player_token) {
+          host.innerHTML = `<iframe src="${data.video_player_url+data.video_player_token}" allow="autoplay;fullscreen;picture-in-picture" allowfullscreen style="width:100%;height:100%;border:none;position:absolute;top:0;left:0"></iframe>`;
+          return;
+        }
+        if (data.download_links?.length || data.download_link) {
+          const enc = data.download_links?.[0]?.path || data.download_link;
+          setupHLS(getProxyUrl(decrypt(enc).trim().replace(/\s/g, ""))); return;
+        }
+        if (data.encrypted_links?.length) {
+          const obj = data.encrypted_links[0];
+          let k2 = atob(decrypt(obj.key)), da = decrypt(obj.path);
+          host.innerHTML = `<iframe src="https://appx-play.classx.co.in/combined-img-player?isMobile=true&videoPlayer=hls&urls=${encodeURIComponent(da)}&key=${encodeURIComponent(k2)}" allow="autoplay;fullscreen;picture-in-picture" allowfullscreen style="width:100%;height:100%;border:none;position:absolute;top:0;left:0"></iframe>`;
+          return;
+        }
+        host.innerHTML = "Video locked / unsupported";
+      } catch(e) { host.innerHTML = "Error loading video"; }
+    }
+    function setupHLS(url) {
+      const host = document.getElementById("player-host");
+      host.innerHTML = `<video id="videoObj" controls autoplay playsinline style="position:absolute;top:0;left:0;width:100%;height:100%"></video>`;
+      const video = document.getElementById("videoObj");
+      if (Hls.isSupported()) {
+        const h = new Hls({ lowLatencyMode: true });
+        h.loadSource(url); h.attachMedia(video);
+      } else { video.src = url; }
+    }
+    function closeProPlayer() {
+      document.getElementById("player-wrapper").style.display = "none";
+      document.getElementById("custom-controls").style.display = "none";
+      document.getElementById("player-host").innerHTML = "";
+    }
+    function goFullScreen() {
+      const iframe = document.querySelector("#player-host iframe");
+      const video = document.getElementById("videoObj");
+      const elem = iframe || video || document.getElementById("player-wrapper");
+      if (!elem) return;
+      if (elem.requestFullscreen) elem.requestFullscreen();
+      else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+      if (screen.orientation?.lock) screen.orientation.lock("landscape").catch(()=>{});
+    }
+
+    /* ===== INIT ===== */
+    function startApp() {
+      document.getElementById("logoutBtn").style.display = "block";
+      document.getElementById("academyScreen").style.display = "none";
+      document.getElementById("loginScreen").style.display = "none";
+      loadCourses();
+      loadPurchased();
+      updateFavSection();
+    }
+
+    (async function initApp() {
+      if (TOKEN && USERID && api_base) {
+        document.getElementById("academyScreen").style.display = "none";
+        document.getElementById("loginScreen").style.display = "none";
+        startApp(); return;
+      }
+      document.getElementById("academyScreen").style.display = "flex";
+      await loadAcademies();
+    })();
+  </script>
+</body>
+</html>

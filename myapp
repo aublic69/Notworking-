@@ -1,0 +1,11 @@
+const ACADEMY_NAME = "NirmitAcademy";
+const API_BASE = "https://nimratacademyapi.akamai.net.in";
+
+const ACADEMY_NAME = "bhainskipathshala";
+const API_BASE = "https://bhainskipathshalaapi.akamai.net.in"; 
+
+const ACADEMY_NAME = "vishwalive";
+const API_BASE = "https://vishwamliveapi.akamai.net.in"; 
+
+const ACADEMY_NAME = "Websankullive";
+const API_BASE = "https://websankulliveapi.classx.co.in"; 
