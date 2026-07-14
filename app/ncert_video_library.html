@@ -1,0 +1,1949 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>NCERT Video Library</title>
+  <meta name="description"
+    content="Complete NCERT video course library for exam preparation. Stream all subjects directly in your browser.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js"></script>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --bg: #09090f;
+      --surface: #13131f;
+      --surface2: #1c1c2e;
+      --border: #252538;
+      --accent: #7c3aed;
+      --accent-glow: rgba(124, 58, 237, 0.35);
+      --accent2: #a855f7;
+      --blue: #3b82f6;
+      --text: #f1f5f9;
+      --text2: #94a3b8;
+      --text3: #64748b;
+      --radius: 14px;
+      --header-h: 60px;
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow-x: hidden
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+      -webkit-font-smoothing: antialiased
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 99px
+    }
+
+    .header {
+      height: var(--header-h);
+      background: rgba(9, 9, 15, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .logo-icon {
+      font-size: 26px
+    }
+
+    .logo-text {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      background: linear-gradient(90deg, #a855f7, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent
+    }
+
+    .logo-sub {
+      font-size: 11px;
+      color: var(--text3);
+      display: none
+    }
+
+    @media(min-width:480px) {
+      .logo-sub {
+        display: block
+      }
+    }
+
+    .back-btn {
+      margin-left: auto;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 7px 14px;
+      border-radius: 99px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: .2s;
+    }
+
+    .back-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent)
+    }
+
+    .back-btn.show {
+      display: flex
+    }
+
+    .page {
+      padding-top: var(--header-h);
+      min-height: 100vh
+    }
+
+    /* HOME */
+    #home-page {
+      padding: 0 16px 40px
+    }
+
+    .hero {
+      text-align: center;
+      padding: 36px 16px 28px
+    }
+
+    .hero h1 {
+      font-size: clamp(22px, 5vw, 34px);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px
+    }
+
+    .hero h1 span {
+      background: linear-gradient(90deg, #a855f7, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent
+    }
+
+    .hero p {
+      color: var(--text2);
+      font-size: 14px
+    }
+
+    .stats {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 0 0 28px
+    }
+
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 20px;
+      text-align: center;
+      min-width: 90px
+    }
+
+    .stat-n {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent2);
+      line-height: 1
+    }
+
+    .stat-l {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: .5px
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media(max-width:480px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px
+      }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      cursor: pointer;
+      transition: all .22s cubic-bezier(.4, 0, .2, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.12), transparent 70%);
+      opacity: 0;
+      transition: .3s;
+    }
+
+    .card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+      box-shadow: 0 0 0 1px var(--accent), 0 12px 32px var(--accent-glow)
+    }
+
+    .card:hover::after {
+      opacity: 1
+    }
+
+    .card:active {
+      transform: scale(0.97)
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .card-icon {
+      font-size: 30px
+    }
+
+    .card-cat {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--accent2);
+      background: rgba(168, 85, 247, 0.12);
+      padding: 3px 8px;
+      border-radius: 6px
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.45;
+      flex: 1
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto
+    }
+
+    .card-count {
+      font-size: 12px;
+      color: var(--text2)
+    }
+
+    .card-arrow {
+      font-size: 20px;
+      color: var(--accent2);
+      font-weight: 700
+    }
+
+    /* FOLDER PAGE */
+    #folder-page {
+      display: none;
+      flex-direction: column
+    }
+
+    #folder-page.show {
+      display: flex
+    }
+
+    .folder-layout {
+      display: flex;
+      flex-direction: row;
+      gap: 0;
+      height: calc(100vh - var(--header-h));
+      overflow: hidden;
+    }
+
+    .player-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-right: 1px solid var(--border);
+    }
+
+    .player-sticky {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden
+    }
+
+    .player-wrap {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      background: #000;
+      flex-shrink: 0
+    }
+
+    .player-wrap video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block
+    }
+
+    .loading-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+    }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--accent2);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .player-info {
+      padding: 14px 18px 12px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      overflow-y: auto;
+    }
+
+    .now-playing-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent2);
+      font-weight: 700;
+      margin-bottom: 4px
+    }
+
+    .player-video-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.35;
+      margin-bottom: 8px
+    }
+
+    .badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center
+    }
+
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 99px
+    }
+
+    .badge-q {
+      background: rgba(124, 58, 237, 0.2);
+      color: var(--accent2);
+      border: 1px solid rgba(124, 58, 237, 0.4)
+    }
+
+    .badge-n {
+      background: rgba(59, 130, 246, 0.15);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.3)
+    }
+
+    .player-controls {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px
+    }
+
+    .ctrl-btn {
+      flex: 1;
+      padding: 8px;
+      border-radius: 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .2s;
+      text-align: center;
+    }
+
+    .ctrl-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent)
+    }
+
+    .ctrl-btn:disabled {
+      opacity: 0.3;
+      cursor: default
+    }
+
+    .list-col {
+      width: 320px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .list-header {
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0
+    }
+
+    .list-folder-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3
+    }
+
+    .list-count {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 3px
+    }
+
+    .search-wrap {
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 12px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent)
+    }
+
+    .search-input::placeholder {
+      color: var(--text3)
+    }
+
+    .video-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px
+    }
+
+    .video-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background .15s;
+      border: 1px solid transparent;
+      margin-bottom: 3px;
+    }
+
+    .video-item:hover {
+      background: var(--surface2);
+      border-color: var(--border)
+    }
+
+    .video-item.active {
+      background: rgba(124, 58, 237, 0.18);
+      border-color: rgba(124, 58, 237, 0.5)
+    }
+
+    .vnum {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text3);
+      flex-shrink: 0;
+    }
+
+    .video-item.active .vnum {
+      background: var(--accent);
+      color: #fff
+    }
+
+    .vname {
+      font-size: 12.5px;
+      color: var(--text2);
+      line-height: 1.3;
+      flex: 1
+    }
+
+    .video-item.active .vname {
+      color: var(--accent2);
+      font-weight: 600
+    }
+
+    .vplay {
+      font-size: 14px;
+      color: var(--accent2);
+      opacity: 0;
+      transition: .15s;
+      flex-shrink: 0
+    }
+
+    .video-item:hover .vplay,
+    .video-item.active .vplay {
+      opacity: 1
+    }
+
+    /* MOBILE */
+    @media(max-width:768px) {
+      #home-page {
+        padding: 0 12px 40px
+      }
+
+      .folder-layout {
+        flex-direction: column;
+        height: auto;
+        overflow: visible
+      }
+
+      .player-col {
+        flex: none;
+        position: sticky;
+        top: var(--header-h);
+        z-index: 100;
+        background: #000;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .player-sticky {
+        flex: none;
+        overflow: visible
+      }
+
+      .list-col {
+        width: 100%;
+        flex: none;
+        background: var(--bg)
+      }
+
+      .video-list {
+        overflow: visible;
+        padding: 8px 12px 60px
+      }
+
+      .player-info {
+        padding: 10px 14px
+      }
+
+      .player-controls {
+        gap: 6px
+      }
+
+      .player-video-title {
+        font-size: 13px
+      }
+
+      .list-header {
+        padding: 12px 14px 8px
+      }
+
+      .list-count {
+        display: none
+      }
+
+      .logo-text {
+        font-size: 16px
+      }
+    }
+
+    .exit-btn {
+      margin-left: auto;
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .exit-btn:hover {
+      background: #dc2626;
+    }
+
+    .speed-select {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid #7c3aed;
+      background: linear-gradient(135deg, #1c1c2e, #2a2145);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      transition: .25s;
+      box-shadow: 0 0 12px rgba(124, 58, 237, .25);
+    }
+
+    .speed-select:hover {
+      border-color: #a855f7;
+      box-shadow: 0 0 18px rgba(168, 85, 247, .45);
+    }
+
+    .speed-select:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 20px rgba(96, 165, 250, .45);
+    }
+
+    .speed-select option {
+      background: #1c1c2e;
+      color: #fff;
+    }
+
+    /* FOOTER CREDIT */
+    .footer-credit {
+      text-align: center;
+      padding: 48px 16px 28px;
+      border-top: 1px solid var(--border);
+      margin-top: 40px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .footer-credit .credit-line {
+      font-size: 12px;
+      color: var(--text3);
+      letter-spacing: .3px;
+    }
+
+    .footer-credit .credit-name {
+      display: inline-block;
+      font-size: 14px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a855f7, #ec4899, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% 200%;
+      animation: creditShine 3s ease infinite;
+      letter-spacing: 1px;
+      padding: 0 2px;
+    }
+
+    @keyframes creditShine {
+      0% {
+        background-position: 0% 50%
+      }
+
+      50% {
+        background-position: 100% 50%
+      }
+
+      100% {
+        background-position: 0% 50%
+      }
+    }
+
+    .footer-credit .credit-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      padding: 6px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      font-size: 11px;
+      color: var(--text2);
+      transition: .3s;
+    }
+
+    .footer-credit .credit-badge:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .footer-credit .credit-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 6px #22c55e;
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .4
+      }
+    }
+
+    /* === PROPLAYER CUSTOM CONTROLS === */
+    #ppContainer {
+      cursor: pointer;
+      position: relative
+    }
+
+    #ppContainer .pp-controls-wrap,
+    #ppContainer .pp-title-bar {
+      opacity: 1;
+      transition: opacity .3s
+    }
+
+    #ppContainer.pp-hide .pp-controls-wrap,
+    #ppContainer.pp-hide .pp-title-bar {
+      opacity: 0;
+      pointer-events: none
+    }
+
+    #ppContainer.pp-hide {
+      cursor: none
+    }
+
+    .pp-title-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(rgba(0, 0, 0, .7), transparent);
+      padding: 12px 16px;
+      z-index: 15;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, .5)
+    }
+
+    .pp-controls-wrap {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0, 0, 0, .85) 40%);
+      padding: 30px 10px 8px;
+      z-index: 15
+    }
+
+    .pp-progress {
+      position: relative;
+      width: 100%;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      margin-bottom: 4px
+    }
+
+    .pp-progress-bar {
+      position: relative;
+      width: 100%;
+      height: 3px;
+      background: rgba(255, 255, 255, .2);
+      border-radius: 3px;
+      transition: height .15s
+    }
+
+    .pp-progress:hover .pp-progress-bar {
+      height: 6px
+    }
+
+    .pp-buffered,
+    .pp-played {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      border-radius: 3px;
+      pointer-events: none
+    }
+
+    .pp-buffered {
+      background: rgba(255, 255, 255, .2)
+    }
+
+    .pp-played {
+      background: var(--accent2, #a855f7)
+    }
+
+    .pp-thumb {
+      position: absolute;
+      top: 50%;
+      width: 14px;
+      height: 14px;
+      background: var(--accent2);
+      border: 2px solid #fff;
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      transition: transform .15s;
+      pointer-events: none;
+      z-index: 2;
+      box-shadow: 0 0 6px var(--accent-glow)
+    }
+
+    .pp-progress:hover .pp-thumb {
+      transform: translate(-50%, -50%) scale(1)
+    }
+
+    .pp-progress-tip {
+      position: absolute;
+      bottom: 24px;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, .9);
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      pointer-events: none;
+      opacity: 0;
+      white-space: nowrap
+    }
+
+    .pp-progress:hover .pp-progress-tip {
+      opacity: 1
+    }
+
+    .pp-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .pp-left,
+    .pp-right {
+      display: flex;
+      align-items: center;
+      gap: 1px
+    }
+
+    .pp-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 13px;
+      transition: all .15s;
+      flex-shrink: 0;
+      position: relative
+    }
+
+    .pp-btn:hover {
+      background: rgba(255, 255, 255, .12)
+    }
+
+    .pp-btn:active {
+      transform: scale(.9)
+    }
+
+    .pp-btn svg {
+      pointer-events: none
+    }
+
+    .pp-btn.pp-active {
+      color: var(--accent2, #a855f7)
+    }
+
+    .pp-btn .pp-tip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, .9);
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 500;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .15s;
+      margin-bottom: 4px
+    }
+
+    .pp-btn:hover .pp-tip {
+      opacity: 1
+    }
+
+    .pp-vol-wrap {
+      display: flex;
+      align-items: center
+    }
+
+    .pp-vol-slider-wrap {
+      width: 0;
+      overflow: hidden;
+      transition: width .25s
+    }
+
+    .pp-vol-wrap:hover .pp-vol-slider-wrap {
+      width: 70px
+    }
+
+    .pp-vol-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 70px;
+      height: 3px;
+      background: rgba(255, 255, 255, .25);
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer
+    }
+
+    .pp-vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      background: #fff;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 3px rgba(0, 0, 0, .3)
+    }
+
+    .pp-vol-slider::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      background: #fff;
+      border-radius: 50%;
+      cursor: pointer;
+      border: none
+    }
+
+    .pp-time {
+      color: rgba(255, 255, 255, .85);
+      font-size: 12px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      padding: 0 8px;
+      white-space: nowrap
+    }
+
+    .pp-speed-popup {
+      position: absolute;
+      bottom: 42px;
+      right: 0;
+      background: rgba(10, 10, 20, .92);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 10px;
+      padding: 4px;
+      min-width: 130px;
+      z-index: 20;
+      opacity: 0;
+      transform: translateY(6px);
+      pointer-events: none;
+      transition: all .2s;
+      max-height: 300px;
+      overflow-y: auto;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .5)
+    }
+
+    .pp-speed-popup.pp-show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto
+    }
+
+    .pp-speed-opt {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #ccc;
+      transition: background .12s
+    }
+
+    .pp-speed-opt:hover {
+      background: rgba(255, 255, 255, .08)
+    }
+
+    .pp-speed-opt.pp-active {
+      color: var(--accent2, #a855f7);
+      font-weight: 600
+    }
+
+    .pp-speed-opt.pp-active::after {
+      content: '✓';
+      color: var(--accent2);
+      font-weight: 700
+    }
+
+    .pp-play-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      width: 64px;
+      height: 64px;
+      background: rgba(124, 58, 237, .8);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 10;
+      opacity: 0
+    }
+
+    .pp-play-overlay.pp-anim {
+      animation: ppPop .45s ease forwards
+    }
+
+    @keyframes ppPop {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0
+      }
+
+      35% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 1
+      }
+
+      100% {
+        transform: translate(-50%, -50%) scale(1.3);
+        opacity: 0
+      }
+    }
+
+    .pp-seek-overlay {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 35%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 10;
+      opacity: 0
+    }
+
+    .pp-seek-left {
+      left: 0
+    }
+
+    .pp-seek-right {
+      right: 0
+    }
+
+    .pp-seek-overlay.pp-anim {
+      animation: ppSeekFade .5s ease
+    }
+
+    @keyframes ppSeekFade {
+      0% {
+        opacity: 0
+      }
+
+      30% {
+        opacity: 1
+      }
+
+      100% {
+        opacity: 0
+      }
+    }
+
+    .pp-seek-ripple {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff
+    }
+
+    .pp-toast {
+      position: absolute;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: rgba(0, 0, 0, .85);
+      color: #fff;
+      padding: 6px 18px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      z-index: 20;
+      pointer-events: none;
+      opacity: 0;
+      transition: all .25s
+    }
+
+    .pp-toast.pp-show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0)
+    }
+
+    .pp-ab-indicator {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(124, 58, 237, .85);
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      z-index: 12;
+      opacity: 0;
+      transition: opacity .2s
+    }
+
+    .pp-ab-indicator.pp-show {
+      opacity: 1
+    }
+
+    #ppContainer:fullscreen,
+    #ppContainer:-webkit-full-screen {
+      width: 100vw !important;
+      height: 100vh !important;
+      padding-top: 0 !important;
+      background: #000
+    }
+
+    #ppContainer:fullscreen video,
+    #ppContainer:-webkit-full-screen video {
+      position: static;
+      width: 100%;
+      height: 100%;
+      object-fit: contain
+    }
+
+    @media(max-width:768px) {
+      .pp-btn {
+        width: 32px;
+        height: 32px
+      }
+
+      .pp-time {
+        font-size: 10px;
+        padding: 0 4px
+      }
+
+      .pp-vol-wrap:hover .pp-vol-slider-wrap {
+        width: 50px
+      }
+
+      .pp-right .pp-btn:nth-child(n+4) {
+        display: none
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="header">
+    <div class="logo-wrap">
+      <span class="logo-icon">📗</span>
+      <div>
+        <div class="logo-text">NCERT Video Library</div>
+        <div class="logo-sub">Complete NCERT Course Material</div>
+      </div>
+    </div>
+    <button class="exit-btn" onclick="goToHome()">✖ Exit</button>
+    <button class="back-btn" id="backBtn" onclick="goHome()">
+      <span>←</span> <span>Subjects</span>
+    </button>
+  </header>
+  <div class="footer-credit">
+    <div class="credit-line">Developed & Curated by</div>
+    <div class="credit-name">⚡ Rix</div>
+    <br>
+    <span class="credit-badge">
+      <span class="dot"></span>
+      Beta tumse na ho payega (Prove me wrong)
+    </span>
+    <span class="credit-badge">
+      <span class="dot"></span>
+      Padh lo beta, yahi umar hai
+    </span>
+  </div>
+
+  <div class="page" id="home-page">
+    <div class="hero">
+      <h1>📗 <span>NCERT All Subjects</span></h1>
+      <p>Select any subject to start watching</p>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-n">10</div>
+        <div class="stat-l">Subjects</div>
+      </div>
+      <div class="stat">
+        <div class="stat-n">244</div>
+        <div class="stat-l">Videos</div>
+      </div>
+      <div class="stat">
+        <div class="stat-n">HLS</div>
+        <div class="stat-l">Streaming</div>
+      </div>
+    </div>
+
+    <div class="grid" id="homeGrid">
+      <div class="card" onclick="showFolder(0)">
+        <div class="card-top">
+          <span class="card-icon">🎨</span>
+          <span class="card-cat">Culture</span>
+        </div>
+        <div class="card-title">NCERT Culture - Abhijitsir</div>
+        <div class="card-footer">
+          <span class="card-count">▶ 12 Videos</span>
+          <span class="card-arrow">›</span>
+        </div>
+      </div>
+      <div class="card" onclick="showFolder(1)">
+        <div class="card-top">
+          <span class="card-icon">🏺</span>
+          <span class="card-cat">History</span>
+        </div>
+        <div class="card-title">NCERT Modern History</div>
+        <div class="card-footer">
+          <span class="card-count">▶ 32 Videos</span>
+          <span class="card-arrow">›</span>
+        </div>
+      </div>
+      <div class="card" onclick="showFolder(2)">
+        <div class="card-top">
+          <span class="card-icon">🏛️</span>
+          <span class="card-cat">History</span>
+        </div>
+        <div class="card-title">NCERT Ancient History</div>
+        <div class="card-footer">
+          <span class="card-count">▶ 31 Videos</span>
+          <span class="card-arrow">›</span>
+        </div>
+      </div>
+      <div class="card" onclick="showFolder(3)">
+        <div class="card-top">
+          <span class="card-icon">🔬</span>
+          <span class="card-cat">Science</span>
+        </div>
+        <div class="card-title">NCERT Genrel Science</div>
+        <div class="card-footer">
+          <span class="card-count">▶ 35 Videos</span>
+          <span class="card-arrow">›</span>
+        </div>
+      </div>
+      <div class="card" onclick="showFolder(4)">
+        <div class="card-top">
+          <span class="card-icon">🎭</span>
+          <span class="card-cat">Culture</span>
+        </div>
+        <div class="card-title">NCERT Culture Prashant Sir</div>
+        <div class="card-footer">
+          <span class="card-count">▶ 10 Videos</span>
+          <span class="card-arrow">›</span>
+        </div>
+      </div>
+      <div class="card" onclick="showFolder(5)">
+        <div class="card-top">
+          <span class="card-icon">⚖️</span>
+          <span class="card-cat">Polity</span>
+        </div>
+        <div class="card-title">NCERT Polity Ravi sir</div>
+        <div class="card-footer">
+          <span class="card-count">▶ 29 Videos</span>
+          <span class="card-arrow">›</span>
+        </div>
+      </div>
+      <div class="card" onclick="showFolder(6)">
+        <div class="card-top">
+          <span class="card-icon">🗺️</span>
+          <span class="card-cat">Geography</span>
+        </div>
+        <div class="card-title">NCERT Geography</div>
+        <div class="card-footer">
+          <span class="card-count">▶ 43 Videos</span>
+          <span class="card-arrow">›</span>
+        </div>
+      </div>
+      <div class="card" onclick="showFolder(7)">
+        <div class="card-top">
+          <span class="card-icon">🌿</span>
+          <span class="card-cat">Environment</span>
+        </div>
+        <div class="card-title">NCERT Environment</div>
+        <div class="card-footer">
+          <span class="card-count">▶ 27 Videos</span>
+          <span class="card-arrow">›</span>
+        </div>
+      </div>
+      <div class="card" onclick="showFolder(8)">
+        <div class="card-top">
+          <span class="card-icon">💰</span>
+          <span class="card-cat">Economy</span>
+        </div>
+        <div class="card-title">NCERT Economy</div>
+        <div class="card-footer">
+          <span class="card-count">▶ 8 Videos</span>
+          <span class="card-arrow">›</span>
+        </div>
+      </div>
+      <div class="card" onclick="showFolder(9)">
+        <div class="card-top">
+          <span class="card-icon">⚖️</span>
+          <span class="card-cat">Polity</span>
+        </div>
+        <div class="card-title">NCERT Polity - Jignesh Sir</div>
+        <div class="card-footer">
+          <span class="card-count">▶ 17 Videos</span>
+          <span class="card-arrow">›</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="page" id="folder-page">
+    <div class="folder-layout">
+      <div class="player-col">
+        <div class="player-sticky">
+          <div class="player-wrap" id="ppContainer">
+            <div class="loading-overlay" id="loadingOverlay">
+              <div class="spinner"></div>
+            </div>
+            <video id="mainVideo" playsinline></video>
+            <div class="pp-title-bar" id="ppTitleBar"><span id="ppVideoTitle"></span></div>
+            <div class="pp-play-overlay" id="ppPlayOverlay"><svg width="32" height="32" viewBox="0 0 24 24"
+                fill="white">
+                <polygon points="5,3 19,12 5,21" />
+              </svg></div>
+            <div class="pp-seek-overlay pp-seek-left" id="ppSeekLeft">
+              <div class="pp-seek-ripple">-10s</div>
+            </div>
+            <div class="pp-seek-overlay pp-seek-right" id="ppSeekRight">
+              <div class="pp-seek-ripple">+10s</div>
+            </div>
+            <div class="pp-ab-indicator" id="ppABIndicator">A-B Loop</div>
+            <div class="pp-toast" id="ppToast"></div>
+            <div class="pp-controls-wrap" id="ppControls">
+              <div class="pp-progress" id="ppProgress">
+                <div class="pp-progress-bar">
+                  <div class="pp-buffered" id="ppBuffered"></div>
+                  <div class="pp-played" id="ppPlayed"></div>
+                  <div class="pp-thumb" id="ppThumb"></div>
+                </div>
+                <div class="pp-progress-tip" id="ppProgressTip">0:00</div>
+              </div>
+              <div class="pp-row">
+                <div class="pp-left">
+                  <button class="pp-btn" id="ppPrev" title="Previous"><svg width="20" height="20" viewBox="0 0 24 24"
+                      fill="white">
+                      <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
+                    </svg><span class="pp-tip">Previous (P)</span></button>
+                  <button class="pp-btn" id="ppRW" title="-10s"><svg width="20" height="20" viewBox="0 0 24 24"
+                      fill="none" stroke="white" stroke-width="2">
+                      <path d="M1 4v6h6" />
+                      <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                    </svg><span class="pp-tip">-10s (←)</span></button>
+                  <button class="pp-btn" id="ppPlayBtn" title="Play"><svg id="ppIconPlay" width="28" height="28"
+                      viewBox="0 0 24 24" fill="white">
+                      <polygon points="5,3 19,12 5,21" />
+                    </svg><svg id="ppIconPause" width="28" height="28" viewBox="0 0 24 24" fill="white"
+                      style="display:none">
+                      <rect x="6" y="4" width="4" height="16" />
+                      <rect x="14" y="4" width="4" height="16" />
+                    </svg><span class="pp-tip">Play (Space)</span></button>
+                  <button class="pp-btn" id="ppFF" title="+10s"><svg width="20" height="20" viewBox="0 0 24 24"
+                      fill="none" stroke="white" stroke-width="2">
+                      <path d="M23 4v6h-6" />
+                      <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                    </svg><span class="pp-tip">+10s (→)</span></button>
+                  <button class="pp-btn" id="ppNext" title="Next"><svg width="20" height="20" viewBox="0 0 24 24"
+                      fill="white">
+                      <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+                    </svg><span class="pp-tip">Next (N)</span></button>
+                  <div class="pp-vol-wrap"><button class="pp-btn" id="ppMute" title="Mute"><svg id="ppVolIcon"
+                        width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="white" />
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                      </svg><span class="pp-tip">Mute (M)</span></button>
+                    <div class="pp-vol-slider-wrap"><input type="range" class="pp-vol-slider" id="ppVolume" min="0"
+                        max="1" step="0.01" value="1"></div>
+                  </div>
+                  <span class="pp-time" id="ppTime">0:00 / 0:00</span>
+                </div>
+                <div class="pp-right">
+                  <div style="position:relative"><button class="pp-btn" id="ppSpeedBtn" title="Speed"><span
+                        id="ppSpeedLabel" style="font-size:12px;font-weight:600">1x</span><span
+                        class="pp-tip">Speed</span></button>
+                    <div class="pp-speed-popup" id="ppSpeedPopup"></div>
+                  </div>
+                  <button class="pp-btn" id="ppFS" title="Fullscreen"><svg id="ppFSIcon" width="18" height="18"
+                      viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                      <polyline points="15 3 21 3 21 9" />
+                      <polyline points="9 21 3 21 3 15" />
+                      <line x1="21" y1="3" x2="14" y2="10" />
+                      <line x1="3" y1="21" x2="10" y2="14" />
+                    </svg><span class="pp-tip">Fullscreen (F)</span></button>
+
+                  <button class="pp-btn" id="ppCapture" title="Screenshot"><svg width="18" height="18"
+                      viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                      <circle cx="12" cy="13" r="4" />
+                    </svg><span class="pp-tip">Screenshot (S)</span></button>
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="player-info">
+            <div class="now-playing-label">▶ Now Playing</div>
+            <div class="player-video-title" id="playerTitle">Select a video</div>
+            <div class="badges">
+              <span class="badge badge-q" id="qualityBadge">—</span>
+              <span class="badge badge-n" id="vidNumBadge">—</span>
+            </div>
+
+
+          </div>
+        </div>
+      </div>
+
+      <div class="list-col">
+        <div class="list-header">
+          <div class="list-folder-name" id="listFolderName">—</div>
+          <div class="list-count" id="listCount">—</div>
+        </div>
+        <div class="search-wrap">
+          <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search videos..."
+            oninput="filterVideos()">
+        </div>
+        <div class="video-list" id="videoList"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const folders = [{ "folder": "NCERT Culture - Abhijitsir", "icon": "🎨", "cat": "Culture", "count": 12, "urls": ["https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4074630/1719804240_2442052011280219/upscgpsc/sem1/1719804162207_803129216821430500_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4076583/1720006204_5568120175870785/upscgpsc/sem1/1720005770600_162537165206728580_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4077825/1720175390_8311916633581218/upscgpsc/sem1/1720175283262_896634090187240600_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4085268/1721044269_2952670521809541/upscgpsc/sem1/1721044232668_755693360256914800_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4089215/1721384045_5243803933715074/upscgpsc/sem1/1721383997728_884343128733948800_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4092451/1721813456_7597467602718746/upscgpsc/sem1/1721813371077_761924949617138800_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4095633/1722246512_9857197010157485/upscgpsc/sem1/1722246463676_201233308191257900_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4099727/1722592338_8303093182715243/upscgpsc/sem1/1722592264598_480221371185550200_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4101503/1722917232_3912012130077892/upscgpsc/sem1/1722917167384_825500036921470200_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4106476/1723454052_3145380221308511/upscgpsc/sem1/1723454009752_24957080079340988_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4109613/1723808540_5380373718280305/upscgpsc/sem1/1723808468259_144689277987981100_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4110055/1723888366_2160770394231224/upscgpsc/sem1/1723888264154_859214996964715500_video_VOD720p30.m3u8"] }, { "folder": "NCERT Modern History", "icon": "🏺", "cat": "History", "count": 32, "urls": ["https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052533/1716978561_7653401182004752/ncert/modernhistory/1716978529095_493449982403844160_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052536/1716978622_6410529811255165/ncert/modernhistory/1716978573257_689988671779012100_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052539/1716978726_6565675726547820/ncert/modernhistory/1716978640738_649459176074883200_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052542/1716978855_9287715547392317/ncert/modernhistory/1716978738770_4350327894584005_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052543/1716978940_8918845923080153/ncert/modernhistory/1716978867910_777071690419481900_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052547/1716979143_7517186673073417/ncert/modernhistory/1716978951573_620664207344129000_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052548/1716979224_2493223660158192/ncert/modernhistory/1716979155947_474028604469117700_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052549/1716979330_4421835113291056/ncert/modernhistory/1716979239184_212712701402783500_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052551/1716979401_2508033841105660/ncert/modernhistory/1716979340845_44551841612895470_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052559/1716979519_3399120946091896/ncert/modernhistory/1716979418691_305962068597058050_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052561/1716979660_9038153249430631/ncert/modernhistory/1716979532353_187710148899073570_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052564/1716979794_3337362404599307/ncert/modernhistory/1716979670905_325507913146554750_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052565/1716979932_8435785022803943/ncert/modernhistory/1716979805834_409425784933362100_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4180673/1729078528_1256039867946606/upscgpsc/sem1/1729078503163_280712806822978700_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4180680/1729078747_2926498530617938/upscgpsc/sem1/1729078539183_884790717597850400_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4180705/1729078961_1275619808635484/upscgpsc/sem1/1729078865053_64321872923275180_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4184113/1729233414_3462163888289056/upscgpsc/sem1/1729233384637_204485073847273000_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4189013/1729494067_1426868998892998/upscgpsc/sem1/1729494041742_753870011682443500_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4189024/1729494127_8308620786925599/upscgpsc/sem1/1729494101912_258626893208906100_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4200938/1729747243_4871173639438329/upscgpsc/sem1/1729747207544_818990156421829400_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4202628/1729840499_1584515383686405/upscgpsc/sem1/1729840469756_106595261586020930_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4202630/1729840543_8913199792701487/upscgpsc/sem1/1729840519783_295266989462026000_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4202633/1729840596_2277761383886833/upscgpsc/sem1/1729840574072_199415333162426100_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4204465/1729936248_8765361554830582/upscgpsc/sem1/1729936221260_291041177858091460_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4204466/1729936297_6900517811823796/upscgpsc/sem1/1729936269886_162342187442125800_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4204677/1729946793_9814161775811561/upscgpsc/sem1/1729946768575_115576738549535490_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4210568/1730811659_8556908540492242/upscgpsc/sem1/1730811641644_705013805250915700_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4211472/1730892854_8144518714246104/upscgpsc/sem1/1730892833990_357526954873111300_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4213480/1731038836_7900911974300284/upscgpsc/sem1/1731038764249_238716892293670460_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4213676/1731046150_9760676734542442/upscgpsc/sem1/1731046124388_148271742609364130_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4215538/1731154031_9531168342494482/upscgpsc/sem1/1731154007016_734973655035381100_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4216353/1731307232_7088039799206345/upscgpsc/sem1/1731307196408_165658420358168800_video_VOD480p30.m3u8"] }, { "folder": "NCERT Ancient History", "icon": "🏛️", "cat": "History", "count": 31, "urls": ["https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052969/1717050625_3350985206967687/ncert/ancienthistory/1717050518630_748055331412493800_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4076547/1720003967_8828773167696489/ncert/ancienthistory/1720003761487_345131553606357000_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4076548/1720004052_8224538282637495/ncert/ancienthistory/1720003988078_243973600827052900_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4089218/1721384271_3215352698545551/ncert/ancienthistory/1721384214039_31986816029463516_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4089220/1721384330_3185014887854398/ncert/ancienthistory/1721384282618_137493835723299020_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4246363/1733291167_4797818465673070/ncert/ancienthistory/1733291065745_531272231047660860_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4277783/1736416634_9366762578302712/ncert/ancienthistory/1736416580148_716418658174026900_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4283709/1737105249_4726283688356490/ncert/ancienthistory/1737104972804_763092458595917800_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4286496/1737449733_5243769216357784/ncert/ancienthistory/1737449712252_406068251340457200_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4288681/1737698442_1198418434891966/ncert/ancienthistory/1737698424608_825392670282106100_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4290907/1738052257_1041635027326695/ncert/ancienthistory/1738052227309_736652746930694900_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4290908/1738052315_2062675713635726/ncert/ancienthistory/1738052290648_830541552644927600_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4298394/1738821482_7815739622150997/ncert/ancienthistory/1738821466086_291606586231876740_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4310599/1740204470_5226114335206042/ncert/ancienthistory/1740204449059_362849632219959200_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4385529/1747651982_6531822861311280/ncert/ancienthistory/1747651961791_704454896493052800_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4398495/1748853336_3746156551198243/ncert/ancienthistory/1748853308730_141632187922546930_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4398496/1748853391_4873252663351741/ncert/ancienthistory/1748853359244_98530889076423980_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4401843/1749114180_1604336621193532/ncert/ancienthistory/1749114166856_624518376959763000_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4401845/1749114219_1953971118205450/ncert/ancienthistory/1749114205327_895849490619256400_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4403898/1749297500_5710611238662083/ncert/ancienthistory/1749297483840_624224695425767400_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4403902/1749297533_9858211772669006/ncert/ancienthistory/1749297517281_424882372731646340_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4410930/1750068452_9912161588206265/ncert/ancienthistory/1750068427940_581336374221529600_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4410932/1750068510_9512115983222510/ncert/ancienthistory/1750068474846_257550002004800740_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4410933/1750068561_7791429660259752/ncert/ancienthistory/1750068535616_235201326043698340_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4411764/1750141037_5038719720002073/ncert/ancienthistory/1750141008173_157422051149846180_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4420487/1750930533_3718884663050216/ncert/ancienthistory/1750930518015_345959695554050940_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4427203/1751103876_8825803429958539/ncert/ancienthistory/1751103859415_474887232428348540_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4463705/1751545184_1816304918574023/ncert/ancienthistory/1751545169969_845943203158700500_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4615216/1764406264_5435434094657070/ncert/ancienthistory/1764406247379_280479688274651330_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4616448/1764590857_2486744827165904/ncert/ancienthistory/1764590838791_611750500784123800_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4616449/1764590909_5589639818229869/ncert/ancienthistory/1764590875559_897691291297878000_video_VOD480p30.m3u8"] }, { "folder": "NCERT Genrel Science", "icon": "🔬", "cat": "Science", "count": 35, "urls": ["https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052975/1717050785_5812108303442762/ncert/generalscience/1717050678707_300663144565594940_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052987/1717050962_4605660262394289/ncert/generalscience/1717050805438_676260193153164900_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4082540/1720693512_3495998892964687/ncert/generalscience/1720693455991_852415363067417300_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4082542/1720693710_9944201553243193/ncert/generalscience/1720693529222_572906719488103940_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4094037/1721991680_1955191796410721/ncert/generalscience/1721991579938_525429289855190200_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4136557/1725606738_5126051879176384/ncert/generalscience/1725606660197_891836380122718300_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4142579/1726206500_4161429530928850/ncert/generalscience/1726206460588_8461481124682968_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4143292/1726303790_1956379238232360/ncert/generalscience/1726303732058_850716882450972200_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4148364/1726821003_6735559588817060/ncert/generalscience/1726820985902_376333494307085440_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4148365/1726821038_3737358432568771/ncert/generalscience/1726821020181_530137813726878900_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4148559/1726835000_4124205704474682/ncert/generalscience/1726834983278_621175264455307100_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4185236/1729251009_2220301041575693/ncert/generalscience/1729250990007_59769855125199720_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4211396/1730888920_8040600325618345/ncert/generalscience/1730888902564_680725336205186800_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4223250/1731742070_2031226532185968/ncert/generalscience/1731742033506_240698066333097730_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4230260/1732344497_8586661712256374/ncert/generalscience/1732344418512_402131211159511600_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4238718/1733115957_4756813183595446/ncert/generalscience/1733115876133_472472104849833900_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4304752/1739532767_1907692038212817/upscgpsc/sem2/1739532707240_604025210213443500_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4307863/1739949987_9372808477560050/upscgpsc/sem2/1739949961534_67125535948086420_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4310529/1740203076_1370111770195464/upscgpsc/sem2/1740203061048_48115868751995610_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4312650/1740482313_3760400591107070/upscgpsc/sem2/1740482269729_526726506096980800_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4328957/1742384049_8338703362879718/upscgpsc/sem2/1742384027283_125952104151352540_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4331826/1742646600_3150875046433453/upscgpsc/sem2/1742646576332_847827084746686300_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4335931/1742988459_3833973045276197/upscgpsc/sem2/1742988440003_173321792720042600_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4339551/1743405424_4038978142458478/upscgpsc/sem2/1743405396094_245649661648819900_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4344947/1743849452_7482846767476443/upscgpsc/sem2/1743849398724_470560183750362500_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4398494/1748853282_8810966022238420/ncert/generalscience/1748853127552_536299820049519100_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4399309/1748934068_6027724874957137/ncert/generalscience/1748934015309_735288034662667800_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4401842/1749114144_5879869161748287/ncert/generalscience/1749114091074_507834368795623300_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4403593/1749281014_9504122007435090/ncert/generalscience/1749280985757_228875220015403900_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4403602/1749281398_9862056450318916/ncert/generalscience/1749281332473_759624173183464200_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4403604/1749281451_1586081932061697/ncert/generalscience/1749281417662_605137468640381300_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4408062/1749721307_2979548032518881/ncert/generalscience/1749721255446_566910274066105150_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4408064/1749721409_5355441800660126/ncert/generalscience/1749721326761_117929366325082960_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4410468/1750052237_5952828033842381/ncert/generalscience/1750052189860_520937612933287800_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4410473/1750052308_2766593435548925/ncert/generalscience/1750052255064_202208750196651780_video_VOD480p30.m3u8"] }, { "folder": "NCERT Culture Prashant Sir", "icon": "🎭", "cat": "Culture", "count": 10, "urls": ["https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4064623/1718449955_2288521152940840/ncert/culture/1718449801720_415398091897740160_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4083275/1720778860_5309224871252626/ncert/culture/1720777334253_874645202239907300_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4083277/1720779106_2377845767420043/ncert/culture/1720779022364_656504452407939500_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4147477/1726728069_4436973529891182/ncert/culture/1726728050697_339866107041458800_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4147479/1726728256_3616557486969761/ncert/culture/1726728084844_404532368435401500_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4148363/1726820878_4960314217857448/ncert/culture/1726820842928_33638295743906510_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4151533/1727241512_8617907920420962/ncert/culture/1727241492032_318149044646120900_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4151535/1727241540_4413100551310359/ncert/culture/1727241525662_89470718733419790_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4238723/1733116279_4370132724053564/ncert/culture/1733116264698_835645323786399000_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4246367/1733291501_5039299711674742/ncert/culture/1733291482070_64171400659931170_video_VOD480p30.m3u8"] }, { "folder": "NCERT Polity Ravi sir", "icon": "⚖️", "cat": "Polity", "count": 29, "urls": ["https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4072003/1719479228_4917903697546327/upscgpsc/sem1/1719479043331_674228460271929000_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4072010/1719479515_9850805666429290/upscgpsc/sem1/1719479424134_668010973269009200_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4072017/1719479730_6100598544063400/upscgpsc/sem1/1719479661030_89606549442591730_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4082468/1720692817_8439005256331423/upscgpsc/sem1/1720692765052_423894034806850800_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4082534/1720693282_6408935397087911/upscgpsc/sem1/1720692828621_846927910569812600_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4083345/1720781866_1495390231729440/upscgpsc/sem1/1720781766319_366813698479571200_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4096983/1722331767_9633586279859699/upscgpsc/sem1/1722331683722_213313481856727100_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4096989/1722331865_8633534982864180/upscgpsc/sem1/1722331787180_644483248871248800_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4101504/1722917317_3190773083526441/upscgpsc/sem1/1722917256654_456472602629356860_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4105778/1723280438_6113779794164005/upscgpsc/sem1/1723280384540_64566245148102744_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4110054/1723888250_1975862674939816/upscgpsc/sem1/1723888196269_178239446252898460_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4110056/1723888434_1882771731116222/upscgpsc/sem1/1723888382473_589530651914420200_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4110057/1723888505_1679151551551901/upscgpsc/sem1/1723888445625_362954064181453800_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4110058/1723888605_1953895635548841/upscgpsc/sem1/1723888519187_105111288399564200_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4113030/1724392563_5089732133127582/upscgpsc/sem1/1724392508401_879695125720013800_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4123845/1724922363_7097366270798599/upscgpsc/sem1/1724922319496_393243786214304300_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4123847/1724922458_9904043041117896/upscgpsc/sem1/1724922415939_279287565074296900_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4123852/1724922719_1908997948314227/upscgpsc/sem1/1724922515814_391748793607877900_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4138397/1725889092_6940882580119218/upscgpsc/sem1/1725889066092_166380429995394370_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4138582/1725942109_8017353341532657/upscgpsc/sem1/1725942081676_781772365661264500_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4138702/1725952047_7528329983144476/upscgpsc/sem1/1725952009357_633759112394721200_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4138703/1725952083_1444963045980011/upscgpsc/sem1/1725952061152_56444174455907590_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4138707/1725952472_9712817325991097/upscgpsc/sem1/1725952096383_860105475168753500_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4143346/1726305628_6403205979340101/upscgpsc/sem1/1726305603546_737610102349059100_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4143347/1726305678_4088245635339353/upscgpsc/sem1/1726305643480_517109753851276800_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4148396/1726823819_1278671344932181/upscgpsc/sem1/1726823796807_119080174902674690_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4148398/1726823914_3085339327531164/upscgpsc/sem1/1726823893863_406016568838586900_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4152635/1727332639_9147723137842554/upscgpsc/sem1/1727332621779_474282411901430800_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4157779/1727858071_1090923492518737/upscgpsc/sem1/1727858056484_574426670203282900_video_VOD480p30.m3u8"] }, { "folder": "NCERT Geography", "icon": "🗺️", "cat": "Geography", "count": 43, "urls": ["https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4189194/1729498844_9809070829775797/ncert/geography/1729498810537_178429424254320930_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4189196/1729498900_6283399821501418/ncert/geography/1729498872296_422825227458268500_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4230545/1732365204_4218195085390249/ncert/geography/1732365179821_216164921372831100_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4230543/1732365157_7924258761249982/ncert/geography/1732365112623_168561346321555400_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4238796/1733119387_4525812198024212/ncert/geography/1733119360403_456753620760188160_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4238797/1733119436_1965791476845052/ncert/geography/1733119407815_249664222007993100_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4238798/1733119492_1866591903969351/ncert/geography/1733119477213_233465702867711940_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4267063/1735040792_6258482145750337/ncert/geography/1735040748241_857915822104449400_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4267064/1735040837_7967596515287403/ncert/geography/1735040808164_323878325507127740_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4267066/1735040884_2994195610232629/ncert/geography/1735040851697_165446355350222400_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4267067/1735040957_1872286892430044/ncert/geography/1735040934448_307676143717701600_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4269644/1735361323_7721327850456616/ncert/geography/1735361299481_165272003445441540_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4269645/1735361369_9916345510039888/ncert/geography/1735361343883_125925630488114140_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4269646/1735361416_1878677738417288/ncert/geography/1735361389275_95519339204848080_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4274996/1736163329_4929496820100675/ncert/geography/1736163248810_440565769123301760_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4274997/1736163379_7881014909128143/ncert/geography/1736163353584_512807672254624800_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4274998/1736163427_5575221990160932/ncert/geography/1736163396833_349840496380132300_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4277784/1736416684_7283019227533085/ncert/geography/1736416659027_665725234202180200_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4298395/1738821551_2297760995534642/ncert/geography/1738821528353_835375921403327400_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4298399/1738821611_1334484932804230/ncert/geography/1738821577974_807514353862843300_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4298401/1738821674_9526872447065450/ncert/geography/1738821639720_207133753089801760_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4298403/1738821730_3144528878471688/ncert/geography/1738821697130_804319387195774500_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4298404/1738821790_3069761864279356/ncert/geography/1738821755032_94248087548958420_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4298406/1738821845_7581347697572303/ncert/geography/1738821813194_174367004435441440_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4306619/1739794567_5012542204968293/ncert/geography/1739794553165_231649338511362140_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4306621/1739794644_5190014188866152/ncert/geography/1739794594417_801611569551408400_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4306622/1739794705_2585330026841483/ncert/geography/1739794669825_783764164436349200_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4320678/1741323745_1397435968424611/ncert/geography/1741323713371_66093596156849420_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4320679/1741323807_1977144911173682/ncert/geography/1741323769075_298563218815213250_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4320683/1741323858_3915055751500673/ncert/geography/1741323835102_274377489733104420_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4321866/1741431441_4902137957982465/upscgpsc/sem2/1741431386076_685060097874764700_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4462315/1751524521_6346225427410803/ncert/geography/1751524493829_204188712055594140_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4462317/1751524569_1606727226889846/ncert/geography/1751524543317_867725791606778000_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4462320/1751524639_5247947834446290/ncert/geography/1751524586987_434586776474923900_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4462322/1751524722_6716434404909140/ncert/geography/1751524703525_75193094973151140_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4462323/1751524764_4450499658770566/ncert/geography/1751524742555_438783856223705800_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4502836/1753778636_9913562378458227/ncert/geography/1753778593159_763268722735532800_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4502837/1753778722_1280173010053471/ncert/geography/1753778686766_529035194152199000_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4513924/1754468686_9551317176637151/ncert/geography/1754468644211_237208344438228860_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4617991/1764740691_1211948605249853/ncert/geography/1764740635982_554925319932011500_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4617992/1764740754_7683839628124631/ncert/geography/1764740708331_96599902925320260_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4617993/1764740803_9463573097940376/ncert/geography/1764740770461_492372057418255740_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4617999/1764741124_6497525153883656/ncert/geography/1764741092195_628380196978243100_video_VOD480p30.m3u8"] }, { "folder": "NCERT Environment", "icon": "🌿", "cat": "Environment", "count": 27, "urls": ["https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052455/1716976293_4512402054958573/ncert/environment/1716976066313_865290544783916500_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052456/1716976324_3997035419150781/ncert/environment/1716976307599_475008080145475840_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052457/1716976370_3715312567916937/ncert/environment/1716976335864_730291472843350800_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052459/1716976427_3512632105338269/ncert/environment/1716976380408_201710215763893440_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052461/1716976488_2458904636210974/ncert/environment/1716976437022_739679549039614100_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052464/1716976540_7007246388558281/ncert/environment/1716976503403_381856801943906300_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052465/1716976587_7069150777848791/ncert/environment/1716976552180_441064837084570500_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052466/1716976638_8442598710947481/ncert/environment/1716976598331_209017966828825600_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052468/1716976678_9605930503834595/ncert/environment/1716976648506_312754037970214700_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052470/1716976713_5628542048014232/ncert/environment/1716976690080_483244988618792600_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052476/1716976756_7545995768182614/ncert/environment/1716976722606_131215361808215490_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052477/1716976809_9565340591872544/ncert/environment/1716976768582_474516222878504000_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4064619/1718449473_3448221794507372/ncert/environment/1718449439256_188350397302387900_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4064620/1718449539_7841277273177364/ncert/environment/1718449495186_838231391478916500_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4274353/1736139729_6378151250132149/ncert/environment/1736139710364_831202577906413800_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4274355/1736139774_2413598829800570/ncert/environment/1736139744910_345498025683735800_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4274357/1736139810_5720938784906491/ncert/environment/1736139788532_75333842467345400_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4274359/1736139843_4093956130988653/ncert/environment/1736139827094_472495780038656960_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4274360/1736139888_7835190640522326/ncert/environment/1736139857141_55181448049141976_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4283710/1737105295_1177759824001483/ncert/environment/1737105270517_618795874378101000_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4283711/1737105339_5269244076812897/ncert/environment/1737105309839_152808292293812220_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4283712/1737105399_3884945954705743/ncert/environment/1737105355197_576677022140441200_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4283714/1737105449_2923056469875591/ncert/environment/1737105414120_100617546196670580_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4283715/1737105484_1584667346506626/ncert/environment/1737105463733_853890507141344600_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4283719/1737105526_8833401141292490/ncert/environment/1737105496622_54376527739462040_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4291514/1738126249_2315887502914841/ncert/environment/1738126226271_474633385737355800_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4291516/1738126313_3108085525265605/ncert/environment/1738126287987_224570553575795400_video_VOD480p30.m3u8"] }, { "folder": "NCERT Economy", "icon": "💰", "cat": "Economy", "count": 8, "urls": ["https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4148362/1726820799_1493792462498638/ncert/economy/1726820784797_149787856756524600_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4184134/1729233585_1496153259937157/ncert/economy/1729233566830_838722741676215400_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4267546/1735118474_9349916061644991/ncert/economy/1735118421025_410943586626102200_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4325760/1742037876_4631810624872342/ncert/economy/1742037694700_21423105243177430_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4344831/1743843275_3664110946615359/ncert/economy/1743843230784_209516971524019700_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4349188/1744361149_7381346563600238/ncert/economy/1744361132521_576188938860445760_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4349179/1744360995_2610361402605741/ncert/economy/1744360985344_131746353862635680_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4392335/1748254398_8760244006576648/ncert/economy/1748254382001_379773677507966460_video_VOD480p30.m3u8"] }, { "folder": "NCERT Polity - Jignesh Sir", "icon": "⚖️", "cat": "Polity", "count": 17, "urls": ["https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052483/1716977024_4964377952853804/ncert/polity/1716976957049_713113889962070300_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052499/1716977097_6656351383167398/ncert/polity/1716977037217_382849054880031200_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052500/1716977183_5758716613003278/ncert/polity/1716977110317_163428152482228160_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052503/1716977278_8948517041243136/ncert/polity/1716977199355_6367795044722202_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052506/1716977476_7154683670955286/ncert/polity/1716977294400_617259410353357300_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052515/1716977563_7977958136195301/ncert/polity/1716977490945_362297958879108700_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052517/1716977659_8429736460811583/ncert/polity/1716977578780_672263694760134500_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052519/1716977773_5533272740143812/ncert/polity/1716977670059_658147233073838100_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052520/1716977874_5471168958626786/ncert/polity/1716977785412_723643185268916100_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4052522/1716977953_6192014431628895/ncert/polity/1716977885687_212334143145228640_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4077752/1720173169_6616096051042167/ncert/polity/1720173087873_166931471462697760_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4080609/1720517209_4646458013191863/ncert/polity/1720517146720_282523280113373060_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4083289/1720779214_6869835061824909/ncert/polity/1720779122823_526980481494214600_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4083300/1720779373_5770902371565096/ncert/polity/1720779230654_295699576924551700_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4084242/1720867999_3066465974578996/ncert/polity/1720867939949_521464525933554900_video_VOD720p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4238720/1733116140_9257665811899533/ncert/polity/1733116105494_92877312986383950_video_VOD480p30.m3u8", "https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/4238721/1733116180_6757930788440904/ncert/polity/1733116158035_351964449921099000_video_VOD480p30.m3u8"] }];
+    let currentFolder = -1, currentVideo = -1, hls = null;
+
+    function goToHome() { location.reload(); }
+
+    function goHome() {
+      document.getElementById('home-page').style.display = '';
+      document.getElementById('folder-page').style.display = 'none';
+      document.getElementById('folder-page').classList.remove('show');
+      document.getElementById('backBtn').classList.remove('show');
+      if (hls) { hls.destroy(); hls = null; }
+      const v = document.getElementById('mainVideo');
+      v.pause(); v.src = '';
+      currentFolder = -1; currentVideo = -1;
+
+      document.querySelector('.footer-credit').style.display = '';
+    }
+
+  </script>
+  <!-- === PROPLAYER ENGINE === -->
+  <script>
+    (function () {
+      const video = document.getElementById('mainVideo');
+      const container = document.getElementById('ppContainer');
+      const ppPlayed = document.getElementById('ppPlayed');
+      const ppBuffered = document.getElementById('ppBuffered');
+      const ppThumb = document.getElementById('ppThumb');
+      const ppTip = document.getElementById('ppProgressTip');
+      const ppProgress = document.getElementById('ppProgress');
+      const ppTime = document.getElementById('ppTime');
+      const ppPlayBtn = document.getElementById('ppPlayBtn');
+      const ppIconPlay = document.getElementById('ppIconPlay');
+      const ppIconPause = document.getElementById('ppIconPause');
+      const ppMute = document.getElementById('ppMute');
+      const ppVolume = document.getElementById('ppVolume');
+      const ppVolIcon = document.getElementById('ppVolIcon');
+      const ppSpeedBtn = document.getElementById('ppSpeedBtn');
+      const ppSpeedPopup = document.getElementById('ppSpeedPopup');
+      const ppSpeedLabel = document.getElementById('ppSpeedLabel');
+      const ppFS = document.getElementById('ppFS');
+      const ppFSIcon = document.getElementById('ppFSIcon');
+      const ppLoop = document.getElementById('ppLoop');
+      const ppAB = document.getElementById('ppAB');
+      const ppABInd = document.getElementById('ppABIndicator');
+      const ppPiP = document.getElementById('ppPiP');
+      const ppCapture = document.getElementById('ppCapture');
+      const ppPrev = document.getElementById('ppPrev');
+      const ppNext = document.getElementById('ppNext');
+      const ppRW = document.getElementById('ppRW');
+      const ppFF = document.getElementById('ppFF');
+      const ppPlayOv = document.getElementById('ppPlayOverlay');
+      const ppSeekL = document.getElementById('ppSeekLeft');
+      const ppSeekR = document.getElementById('ppSeekRight');
+      const ppToast = document.getElementById('ppToast');
+      const ppVideoTitle = document.getElementById('ppVideoTitle');
+      const playerTitle = document.getElementById('playerTitle');
+      let prevVol = 1, isLoop = false, abState = 0, abA = null, abB = null;
+      let hideTimer = null, toastTimer = null, isSeeking = false;
+      const SPEEDS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 4];
+      // === UTILITIES ===
+      function fmt(s) {
+        if (!s || !isFinite(s)) return '0:00';
+        s = Math.floor(Math.max(0, s));
+        const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), sec = s % 60;
+        return h > 0 ? h + ':' + String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0') : m + ':' + String(sec).padStart(2, '0');
+      }
+      function showToast(msg) {
+        ppToast.textContent = msg;
+        ppToast.classList.add('pp-show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { ppToast.classList.remove('pp-show'); }, 1200);
+      }
+      function animEl(el) {
+        el.classList.remove('pp-anim');
+        void el.offsetWidth;
+        el.classList.add('pp-anim');
+        setTimeout(function () { el.classList.remove('pp-anim'); }, 500);
+      }
+      function resetHide() {
+        container.classList.remove('pp-hide');
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(function () {
+          if (!video.paused) container.classList.add('pp-hide');
+        }, 3000);
+      }
+      function updateVolIcon() {
+        var v = video.volume, m = video.muted, paths;
+        if (m || v === 0) {
+          paths = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="white"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>';
+        } else if (v <= 0.5) {
+          paths = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="white"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>';
+        } else {
+          paths = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="white"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>';
+        }
+        ppVolIcon.innerHTML = paths;
+      }
+      // === SPEED MENU ===
+      SPEEDS.forEach(function (s) {
+        var opt = document.createElement('div');
+        opt.className = 'pp-speed-opt' + (s === 1 ? ' pp-active' : '');
+        opt.textContent = s + 'x' + (s === 1 ? ' (Normal)' : '');
+        opt.dataset.speed = s;
+        opt.onclick = function (e) {
+          e.stopPropagation();
+          video.playbackRate = s;
+          ppSpeedLabel.textContent = s + 'x';
+          document.querySelectorAll('.pp-speed-opt').forEach(function (o) { o.classList.toggle('pp-active', parseFloat(o.dataset.speed) === s); });
+          ppSpeedPopup.classList.remove('pp-show');
+          showToast('Speed: ' + s + 'x');
+        };
+        ppSpeedPopup.appendChild(opt);
+      });
+      // === PLAY/PAUSE ===
+      function togglePlay() {
+        if (!video.src && !video.currentSrc) return;
+        video.paused ? video.play() : video.pause();
+      }
+      ppPlayBtn.onclick = togglePlay;
+      video.addEventListener('play', function () {
+        ppIconPlay.style.display = 'none';
+        ppIconPause.style.display = 'block';
+        resetHide();
+      });
+      video.addEventListener('pause', function () {
+        ppIconPlay.style.display = 'block';
+        ppIconPause.style.display = 'none';
+        container.classList.remove('pp-hide');
+      });
+      // Video click: single=play/pause, double=seek/fullscreen
+      var tapTimer = null, tapCount = 0;
+      video.addEventListener('click', function (e) {
+        tapCount++;
+        if (tapCount === 1) {
+          tapTimer = setTimeout(function () {
+            tapCount = 0;
+            togglePlay();
+            animEl(ppPlayOv);
+          }, 250);
+        } else if (tapCount === 2) {
+          clearTimeout(tapTimer);
+          tapCount = 0;
+          var rect = container.getBoundingClientRect();
+          var x = e.clientX - rect.left;
+          if (x < rect.width / 3) {
+            video.currentTime = Math.max(0, video.currentTime - 10);
+            animEl(ppSeekL); showToast('-10s');
+          } else if (x > rect.width * 2 / 3) {
+            video.currentTime = Math.min(video.duration || 0, video.currentTime + 10);
+            animEl(ppSeekR); showToast('+10s');
+          } else { toggleFS(); }
+        }
+      });
+      // === PROGRESS BAR ===
+      video.addEventListener('timeupdate', function () {
+        if (!video.duration || isSeeking) return;
+        var pct = video.currentTime / video.duration * 100;
+        ppPlayed.style.width = pct + '%';
+        ppThumb.style.left = pct + '%';
+        ppTime.textContent = fmt(video.currentTime) + ' / ' + fmt(video.duration);
+        if (abState === 2 && abB !== null && video.currentTime >= abB) video.currentTime = abA;
+      });
+      video.addEventListener('progress', function () {
+        if (video.buffered.length > 0) {
+          ppBuffered.style.width = (video.buffered.end(video.buffered.length - 1) / video.duration * 100) + '%';
+        }
+      });
+      function seekTo(e) {
+        var rect = ppProgress.getBoundingClientRect();
+        var pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        if (video.duration) video.currentTime = pct * video.duration;
+      }
+      ppProgress.addEventListener('mousedown', function (e) { isSeeking = true; seekTo(e); });
+      document.addEventListener('mousemove', function (e) {
+        if (isSeeking) seekTo(e);
+        var rect = ppProgress.getBoundingClientRect();
+        var pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        ppTip.textContent = fmt(pct * (video.duration || 0));
+        ppTip.style.left = pct * 100 + '%';
+      });
+      document.addEventListener('mouseup', function () { isSeeking = false; });
+      // === VOLUME ===
+      ppVolume.addEventListener('input', function () {
+        video.volume = parseFloat(ppVolume.value);
+        video.muted = false; prevVol = video.volume; updateVolIcon();
+      });
+      ppMute.onclick = function () {
+        if (video.muted || video.volume === 0) {
+          video.muted = false; video.volume = prevVol || 0.5; ppVolume.value = video.volume;
+        } else {
+          prevVol = video.volume; video.muted = true;
+        }
+        updateVolIcon();
+        showToast(video.muted ? 'Muted' : 'Volume: ' + Math.round(video.volume * 100) + '%');
+      };
+      // === SPEED ===
+      ppSpeedBtn.onclick = function (e) { e.stopPropagation(); ppSpeedPopup.classList.toggle('pp-show'); };
+      document.addEventListener('click', function () { ppSpeedPopup.classList.remove('pp-show'); });
+      function changeSpeed(dir) {
+        var cur = video.playbackRate;
+        var idx = SPEEDS.indexOf(cur);
+        if (idx === -1) idx = SPEEDS.findIndex(function (s) { return s >= cur; });
+        idx = Math.max(0, Math.min(SPEEDS.length - 1, (idx === -1 ? 3 : idx) + dir));
+        video.playbackRate = SPEEDS[idx];
+        ppSpeedLabel.textContent = SPEEDS[idx] + 'x';
+        document.querySelectorAll('.pp-speed-opt').forEach(function (o) { o.classList.toggle('pp-active', parseFloat(o.dataset.speed) === SPEEDS[idx]); });
+        showToast('Speed: ' + SPEEDS[idx] + 'x');
+      }
+      // === NAVIGATION ===
+      ppPrev.onclick = function () { if (typeof prevVideo === 'function') prevVideo(); };
+      ppNext.onclick = function () { if (typeof nextVideo === 'function') nextVideo(); };
+      ppRW.onclick = function () { video.currentTime = Math.max(0, video.currentTime - 10); animEl(ppSeekL); showToast('-10s'); };
+      ppFF.onclick = function () { video.currentTime = Math.min(video.duration || 0, video.currentTime + 10); animEl(ppSeekR); showToast('+10s'); };
+      // === LOOP ===
+      if (ppLoop) ppLoop.onclick = function () {
+        isLoop = !isLoop; video.loop = isLoop;
+        ppLoop.classList.toggle('pp-active', isLoop);
+        showToast(isLoop ? 'Loop: ON' : 'Loop: OFF');
+      };
+      // === A-B LOOP ===
+      if (ppAB) ppAB.onclick = function () {
+        if (abState === 0) {
+          abState = 1; abA = video.currentTime; abB = null;
+          ppABInd.textContent = 'A: ' + fmt(abA);
+          ppABInd.classList.add('pp-show');
+          ppAB.classList.add('pp-active');
+          showToast('Point A: ' + fmt(abA));
+        } else if (abState === 1) {
+          abState = 2; abB = video.currentTime;
+          if (abB < abA) { var t = abA; abA = abB; abB = t; }
+          ppABInd.textContent = 'A: ' + fmt(abA) + ' → B: ' + fmt(abB);
+          showToast('A-B Loop Active');
+        } else {
+          abState = 0; abA = abB = null;
+          ppABInd.classList.remove('pp-show');
+          ppAB.classList.remove('pp-active');
+          showToast('A-B Loop: OFF');
+        }
+      };
+      // === PIP ===
+      if (ppPiP) ppPiP.onclick = function () {
+        try {
+          if (document.pictureInPictureElement) document.exitPictureInPicture();
+          else video.requestPictureInPicture();
+        } catch (e) { showToast('PiP not available'); }
+      };
+      // === SCREENSHOT ===
+      ppCapture.onclick = function () {
+        if (!video.videoWidth) { showToast('No video'); return; }
+        var c = document.createElement('canvas');
+        c.width = video.videoWidth; c.height = video.videoHeight;
+        c.getContext('2d').drawImage(video, 0, 0);
+        var a = document.createElement('a');
+        a.download = 'screenshot_' + fmt(video.currentTime).replace(/:/g, '-') + '.png';
+        a.href = c.toDataURL('image/png'); a.click();
+        showToast('Screenshot saved!');
+      };
+      // === FULLSCREEN ===
+      function toggleFS() {
+        if (!document.fullscreenElement) container.requestFullscreen().catch(function () { });
+        else document.exitFullscreen();
+      }
+      ppFS.onclick = toggleFS;
+      document.addEventListener('fullscreenchange', function () {
+        var fs = !!document.fullscreenElement;
+        ppFSIcon.innerHTML = fs
+          ? '<polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/>'
+          : '<polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>';
+      });
+      // === AUTO-HIDE CONTROLS ===
+      container.addEventListener('mousemove', resetHide);
+      container.addEventListener('touchstart', resetHide);
+      // === SCROLL WHEEL VOLUME ===
+      container.addEventListener('wheel', function (e) {
+        e.preventDefault();
+        video.volume = Math.max(0, Math.min(1, video.volume + (e.deltaY > 0 ? -0.05 : 0.05)));
+        ppVolume.value = video.volume; video.muted = false; updateVolIcon();
+        showToast('Volume: ' + Math.round(video.volume * 100) + '%');
+      }, { passive: false });
+      // === SYNC TITLE ===
+      if (playerTitle) {
+        var titleObs = new MutationObserver(function () {
+          ppVideoTitle.textContent = playerTitle.textContent;
+        });
+        titleObs.observe(playerTitle, { childList: true, characterData: true, subtree: true });
+      }
+      // === KEYBOARD SHORTCUTS ===
+      document.addEventListener('keydown', function (e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        var k = e.key.toLowerCase();
+        switch (k) {
+          case ' ': case 'k': e.preventDefault(); togglePlay(); animEl(ppPlayOv); break;
+          case 'arrowleft': e.preventDefault(); video.currentTime = Math.max(0, video.currentTime - 10); animEl(ppSeekL); showToast('-10s'); break;
+          case 'arrowright': e.preventDefault(); video.currentTime = Math.min(video.duration || 0, video.currentTime + 10); animEl(ppSeekR); showToast('+10s'); break;
+          case 'arrowup': e.preventDefault(); video.volume = Math.min(1, video.volume + 0.05); ppVolume.value = video.volume; video.muted = false; updateVolIcon(); showToast('Volume: ' + Math.round(video.volume * 100) + '%'); break;
+          case 'arrowdown': e.preventDefault(); video.volume = Math.max(0, video.volume - 0.05); ppVolume.value = video.volume; updateVolIcon(); showToast('Volume: ' + Math.round(video.volume * 100) + '%'); break;
+          case 'j': video.currentTime = Math.max(0, video.currentTime - 5); showToast('-5s'); break;
+          case 'l': video.currentTime = Math.min(video.duration || 0, video.currentTime + 5); showToast('+5s'); break;
+          case 'm': ppMute.click(); break;
+          case 'f': toggleFS(); break;
+          case 'i': if (ppPiP) ppPiP.click(); break;
+          case 's': ppCapture.click(); break;
+          case 'b': if (ppAB) ppAB.click(); break;
+          case 'n': if (typeof nextVideo === 'function') nextVideo(); break;
+          case 'p': if (typeof prevVideo === 'function') prevVideo(); break;
+          case '.': if (video.paused) { video.currentTime = Math.min(video.duration, video.currentTime + 1 / 30); showToast('Frame →'); } break;
+          case ',': if (video.paused) { video.currentTime = Math.max(0, video.currentTime - 1 / 30); showToast('← Frame'); } break;
+          case 'escape': ppSpeedPopup.classList.remove('pp-show'); if (typeof goHome === 'function') goHome(); break;
+          case 'home': e.preventDefault(); video.currentTime = 0; showToast('Start'); break;
+          case 'end': e.preventDefault(); video.currentTime = video.duration || 0; break;
+          case '[': changeSpeed(-1); break;
+          case ']': changeSpeed(1); break;
+          default:
+            if (/^[0-9]$/.test(k) && video.duration) { video.currentTime = parseInt(k) / 10 * video.duration; showToast(parseInt(k) * 10 + '%'); }
+        }
+      });
+      updateVolIcon();
+      console.log('%c🎬 ProPlayer Loaded', 'color: #a855f7; font-size: 14px; font-weight: bold;');
+    })();
+
+
+    function showFolder(idx) {
+      currentFolder = idx;
+      const f = folders[idx];
+      document.getElementById('home-page').style.display = 'none';
+      document.getElementById('folder-page').style.display = 'flex';
+      document.getElementById('folder-page').classList.add('show');
+      document.getElementById('backBtn').classList.add('show');
+      document.getElementById('listFolderName').textContent = f.folder;
+      document.getElementById('listCount').textContent = f.count + ' Videos';
+      document.querySelector('.footer-credit').style.display = 'none';
+      renderVideoList(f);
+      playVideo(0);
+    }
+
+    function renderVideoList(f) {
+      const list = document.getElementById('videoList');
+      list.innerHTML = f.urls.map((u, i) => {
+        const name = 'Video ' + (i + 1);
+        return `<div class="video-item" id="vi${i}" onclick="playVideo(${i})">
+          <div class="vnum">${i + 1}</div>
+          <div class="vname">${name}</div>
+          <div class="vplay">▶</div>
+        </div>`;
+      }).join('');
+    }
+
+    function playVideo(idx) {
+      const f = folders[currentFolder];
+      if (!f || idx < 0 || idx >= f.urls.length) return;
+      currentVideo = idx;
+      const url = f.urls[idx];
+
+      document.getElementById('playerTitle').textContent = 'Video ' + (idx + 1);
+      document.getElementById('qualityBadge').textContent = '480p';
+      document.getElementById('vidNumBadge').textContent = (idx + 1) + ' / ' + f.count;
+   
+
+      document.querySelectorAll('.video-item').forEach((el, i) => el.classList.toggle('active', i === idx));
+      const active = document.getElementById('vi' + idx);
+      if (active) active.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+      const overlay = document.getElementById('loadingOverlay');
+      overlay.style.display = 'flex';
+      const video = document.getElementById('mainVideo');
+
+      if (hls) { hls.destroy(); hls = null; }
+
+      if (Hls.isSupported()) {
+        hls = new Hls({ maxBufferLength: 30, maxMaxBufferLength: 60 });
+        hls.loadSource(url);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          overlay.style.display = 'none';
+          video.play().catch(() => { });
+          const spd = document.getElementById('speedControl').value;
+          video.playbackRate = parseFloat(spd);
+        });
+        hls.on(Hls.Events.ERROR, (e, d) => {
+          if (d.fatal) overlay.style.display = 'none';
+        });
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = url;
+        video.addEventListener('canplay', () => {
+          overlay.style.display = 'none';
+          video.play().catch(() => { });
+        }, { once: true });
+      }
+    }
+
+    function prevVideo() { if (currentVideo > 0) playVideo(currentVideo - 1); }
+    function nextVideo() {
+      const f = folders[currentFolder];
+      if (f && currentVideo < f.urls.length - 1) playVideo(currentVideo + 1);
+    }
+    function setSpeed(v) { document.getElementById('mainVideo').playbackRate = parseFloat(v); }
+
+    function filterVideos() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      document.querySelectorAll('.video-item').forEach(el => {
+        const name = el.querySelector('.vname').textContent.toLowerCase();
+        el.style.display = (!q || name.includes(q)) ? '' : 'none';
+      });
+    }
+
+    // Auto next
+    document.getElementById('mainVideo').addEventListener('ended', () => {
+      const f = folders[currentFolder];
+      if (f && currentVideo < f.urls.length - 1) playVideo(currentVideo + 1);
+    });
+
+    // Init
+
+  </script>
+
+
+</body>
+
+</html>
