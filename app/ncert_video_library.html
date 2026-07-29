@@ -1399,6 +1399,46 @@
         .folder-watch-hdr-btn:hover { border-color:#f59e0b; color:#f59e0b; }
         .folder-watch-hdr-btn.saved { background:rgba(245,158,11,.15); border-color:#f59e0b; color:#f59e0b; }
 
+    
+        /* ===== WATCHLIST BUTTONS VIBRANT YELLOW ===== */
+        .card-watch-btn.saved {
+            background: #f59e0b !important;
+            border-color: #d97706 !important;
+            color: #0f172a !important;
+            font-weight: 800 !important;
+            box-shadow: 0 0 14px rgba(245, 158, 11, 0.6) !important;
+        }
+
+        .folder-watch-hdr-btn {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.25s ease;
+            flex-shrink: 0;
+        }
+
+        .folder-watch-hdr-btn:hover {
+            border-color: #f59e0b;
+            color: #f59e0b;
+            transform: scale(1.04);
+        }
+
+        .folder-watch-hdr-btn.saved {
+            background: #f59e0b !important;
+            border-color: #d97706 !important;
+            color: #0f172a !important;
+            font-weight: 800 !important;
+            box-shadow: 0 0 16px rgba(245, 158, 11, 0.7) !important;
+        }
+
     </style>
 </head>
 
@@ -2465,6 +2505,17 @@
             }
 
             // Update watchlist badge
+            
+            // Update folder header watchlist btn
+            const hdrBtn = document.getElementById('folderWatchlistHdrBtn');
+            if(hdrBtn && typeof currentFolder !== 'undefined' && currentFolder !== null) {
+                const saved = wl.includes(currentFolder);
+                hdrBtn.classList.toggle('saved', saved);
+                const icon = document.getElementById('folderWatchHdrIcon');
+                if(icon) icon.textContent = saved ? '⭐' : '☆';
+                hdrBtn.title = saved ? 'Remove from Watchlist' : 'Add to Watchlist';
+            }
+
             const wlBadge = document.getElementById('badgeWatchlistCount');
             if(wlBadge) wlBadge.textContent = wl.length;
             const contBadge = document.getElementById('badgeContinueCount');
