@@ -1,0 +1,4198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="no-referrer">
+    <title>WebSankul Pro — Enterprise Learning Platform</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: rgba(99, 102, 241, 0.15);
+            --primary-dark: #4338ca;
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #7c3aed 50%, #2563eb 100%);
+            --accent: #f59e0b;
+            --accent-gradient: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+
+            /* DARK THEME (DEFAULT) */
+            --bg: #090d16;
+            --surface: #131b2e;
+            --surface-elevated: #1e293b;
+            --text: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --border: #232f48;
+            --border-light: #1b2438;
+
+            --success: #10b981;
+            --success-light: rgba(16, 185, 129, 0.15);
+            --danger: #ef4444;
+            --danger-light: rgba(239, 68, 68, 0.15);
+            --warning: #f59e0b;
+            --warning-light: rgba(245, 158, 11, 0.15);
+            --info: #3b82f6;
+            --info-light: rgba(59, 130, 246, 0.15);
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+            --shadow-primary: 0 10px 40px -10px rgba(99, 102, 241, 0.4);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* LIGHT THEME OVERRIDE */
+        :root:has(body.light-theme),
+        body.light-theme {
+            --bg: #f8fafc !important;
+            --surface: #ffffff !important;
+            --surface-elevated: #ffffff !important;
+            --text: #0f172a !important;
+            --text-secondary: #334155 !important;
+            --text-muted: #64748b !important;
+            --border: #e2e8f0 !important;
+            --border-light: #f1f5f9 !important;
+            --primary-light: #eef2ff !important;
+            --success-light: #d1fae5 !important;
+            --danger-light: #fee2e2 !important;
+            --warning-light: #fef3c7 !important;
+            --info-light: #dbeafe !important;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        body.light-theme {
+            background-color: #f8fafc !important;
+            color: #0f172a !important;
+        }
+
+        body.light-theme .app-header,
+        body.light-theme .app-nav {
+            background: #ffffff !important;
+            border-bottom-color: #e2e8f0 !important;
+        }
+
+        body.light-theme .card,
+        body.light-theme .package-card,
+        body.light-theme .subject-card,
+        body.light-theme .lecture-item,
+        body.light-theme .search-bar,
+        body.light-theme .exam-card,
+        body.light-theme .modal-content,
+        body.light-theme .profile-hero,
+        body.light-theme .profile-info-grid,
+        body.light-theme .info-item {
+            background: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+
+        body.light-theme input,
+        body.light-theme textarea {
+            background: #f8fafc !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ═══ LOADING SCREEN ═══ */
+        #app-loading {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+            background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #f0f9ff 100%);
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        #app-loading.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-ring {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 3px solid var(--primary-light);
+            border-top-color: var(--primary);
+            border-right-color: var(--primary-dark);
+            animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loader-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
+
+        .loader-brand {
+            font-size: 28px;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ═══ TOAST ═══ */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9998;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--text);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: var(--radius-lg);
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            transition: var(--transition);
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 400px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .toast-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        /* ═══ SCROLL TOP ═══ */
+        #scroll-top {
+            position: fixed;
+            right: 20px;
+            bottom: 90px;
+            display: none;
+            background: var(--surface);
+            color: var(--primary);
+            border: 1px solid var(--border);
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            z-index: 100;
+            font-size: 18px;
+            font-weight: 700;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            align-items: center;
+            justify-content: center;
+        }
+
+        #scroll-top.show {
+            display: flex;
+        }
+
+        #scroll-top:hover {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* ═══ AUTH SCREEN ═══ */
+        #auth-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 24px;
+            background: linear-gradient(135deg, #eef2ff 0%, #f0f9ff 25%, #fdf4ff 50%, #fff7ed 75%, #f8fafc 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .auth-card {
+            background: var(--surface);
+            width: 460px;
+            max-width: 100%;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+        }
+
+        .logo {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .logo-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius);
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 24px;
+            font-weight: 800;
+            box-shadow: var(--shadow-primary);
+        }
+
+        .logo-text h2 {
+            font-size: 26px;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .sub {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 24px;
+            background: var(--bg);
+            padding: 4px;
+            border-radius: var(--radius);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: var(--transition);
+            font-family: inherit;
+            position: relative;
+        }
+
+        .auth-tab.active {
+            background: var(--surface);
+            color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .auth-tab:hover:not(.active) {
+            color: var(--text-secondary);
+        }
+
+        .auth-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .auth-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="tel"],
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        .otp-inputs input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: var(--radius);
+            border: 1.5px solid var(--border);
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text);
+            background: var(--bg);
+            transition: var(--transition);
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--surface);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: #fff;
+            box-shadow: var(--shadow-primary);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 40px -10px rgba(79, 70, 229, 0.5);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .otp-inputs {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .otp-inputs input {
+            width: 56px;
+            height: 56px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: 700;
+            border-radius: var(--radius);
+            padding: 0;
+            background: var(--bg);
+        }
+
+        .otp-inputs input:focus {
+            background: var(--surface);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        /* ═══ APP SHELL ═══ */
+        #app-shell {
+            display: none;
+        }
+
+        #app-shell.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 28px;
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 800;
+            box-shadow: var(--shadow-primary);
+        }
+
+        .brand span {
+            font-weight: 700;
+            font-size: 18px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dev-setting-btn {
+            margin-left: auto;
+            margin-right: 8px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: #fff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+
+        .dev-setting-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .exit-btn {
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 12px;
+            transition: background 0.2s ease;
+        }
+
+        .exit-btn:hover {
+            background: #dc2626;
+        }
+
+        .user-info {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+            padding: 4px 12px 4px 4px;
+            border-radius: var(--radius-lg);
+            transition: var(--transition);
+        }
+
+        .user-info:hover {
+            background: var(--bg);
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .name::after {
+            content: '▼';
+            font-size: 8px;
+            margin-left: 6px;
+            color: var(--text-muted);
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            right: 0;
+            top: 52px;
+            background: var(--surface);
+            width: 260px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            z-index: 300;
+            animation: dropdownIn 0.2s ease;
+        }
+
+        .profile-dropdown.show {
+            display: flex;
+        }
+
+        @keyframes dropdownIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .pd-header {
+            padding: 16px;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pd-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+        }
+
+        .pd-header h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .pd-header p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .pd-divider {
+            height: 1px;
+            background: var(--border);
+        }
+
+        .pd-item {
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            text-align: left;
+            width: 100%;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text);
+            transition: var(--transition);
+            font-family: inherit;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pd-item:hover {
+            background: var(--bg);
+        }
+
+        .pd-item.danger {
+            color: var(--danger);
+        }
+
+        .pd-item.danger:hover {
+            background: var(--danger-light);
+        }
+
+        .pd-icon {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* ═══ FIXED BOTTOM NAVIGATION ═══ */
+        .app-nav {
+            display: flex;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            align-items: center;
+            justify-content: space-around;
+            z-index: 1000;
+            padding: 0 16px;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .app-nav {
+            background: #ffffff !important;
+            border-top-color: #e2e8f0 !important;
+        }
+
+        .app-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .app-nav-item {
+            flex: 1;
+            max-width: 120px;
+            height: 46px;
+            border-radius: var(--radius);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            color: var(--text-muted);
+            font-family: inherit;
+        }
+
+        .app-nav-item .nav-icon {
+            font-size: 18px;
+            line-height: 1;
+            transition: transform 0.2s ease;
+        }
+
+        .app-nav-item .nav-text {
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .app-nav-item.active {
+            background: var(--primary-light);
+            color: var(--primary) !important;
+        }
+
+        .app-nav-item.active .nav-icon {
+            transform: scale(1.1);
+        }
+
+        .app-nav-item:hover:not(.active) {
+            background: var(--surface-hover);
+            color: var(--primary);
+        }
+
+        /* ═══ CONTENT ═══ */
+        .app-content {
+            padding: 28px;
+            padding-bottom: 80px !important;
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: calc(100vh - 140px);
+        }
+
+            .section {
+                margin-bottom: 32px;
+            }
+
+            .section-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .section-header h2 {
+                font-size: 20px;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .section-header a {
+                color: var(--primary);
+                font-size: 13px;
+                font-weight: 600;
+                cursor: pointer;
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                padding: 6px 12px;
+                border-radius: var(--radius-sm);
+                transition: var(--transition);
+            }
+
+            .section-header a:hover {
+                background: var(--primary-light);
+                text-decoration: none;
+            }
+
+            /* ═══ BANNER CAROUSEL ═══ */
+            .banner-carousel {
+                position: relative;
+                overflow: hidden;
+                border-radius: var(--radius-xl);
+                margin-bottom: 32px;
+                background: var(--primary-light);
+                max-height: 240px;
+                box-shadow: var(--shadow-md);
+            }
+
+            .slides {
+                display: flex;
+                transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+                height: 220px;
+            }
+
+            .slide {
+                min-width: 100%;
+                overflow: hidden;
+                position: relative;
+            }
+
+            .slide img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .slide-overlay {
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(90deg, rgba(15, 23, 42, 0.7) 0%, rgba(15, 23, 42, 0.2) 60%, transparent 100%);
+                display: flex;
+                align-items: center;
+                padding: 0 40px;
+            }
+
+            .slide-content h3 {
+                color: #fff;
+                font-size: 24px;
+                font-weight: 800;
+                margin-bottom: 8px;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+
+            .slide-content p {
+                color: rgba(255, 255, 255, 0.85);
+                font-size: 14px;
+                max-width: 400px;
+                line-height: 1.6;
+            }
+
+            .dots {
+                position: absolute;
+                bottom: 16px;
+                left: 50%;
+                transform: translateX(-50%);
+                display: flex;
+                gap: 8px;
+            }
+
+            .dots span {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.4);
+                cursor: pointer;
+                transition: var(--transition);
+            }
+
+            .dots span.active {
+                background: #fff;
+                width: 24px;
+                border-radius: 4px;
+            }
+
+            /* ═══ CARDS & THUMBNAILS FIX ═══ */
+            .package-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 20px;
+            }
+
+            .package-card {
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-lg);
+                overflow: hidden;
+                cursor: pointer;
+                transition: var(--transition);
+                position: relative;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .package-card::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-lg);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
+            }
+
+            .package-card:hover {
+                transform: translateY(-6px);
+                border-color: var(--primary);
+            }
+
+            .package-card:hover::after {
+                opacity: 1;
+            }
+
+            .pimg {
+                position: relative;
+                width: 100%;
+                aspect-ratio: 16 / 9;
+                height: auto;
+                background: linear-gradient(135deg, #0f172a, #1e293b);
+                overflow: hidden;
+                border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .pimg img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                object-position: center;
+                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .package-card:hover .pimg img {
+                transform: scale(1.05);
+            }
+
+            /* Ebook portrait thumbnail fix */
+            .pimg.ebook-thumb-wrap {
+                height: 210px;
+                aspect-ratio: auto;
+                background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+                padding: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+            }
+
+            .pimg.ebook-thumb-wrap img.ebook-thumb-img {
+                max-height: 100%;
+                max-width: 100%;
+                width: auto;
+                height: 100%;
+                object-fit: contain;
+                border-radius: 6px;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            }
+
+            .img-fallback {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 40px;
+                width: 100%;
+                height: 100%;
+                color: var(--text-muted);
+                background: rgba(255, 255, 255, 0.03);
+            }
+
+            .ptype {
+                position: absolute;
+                top: 12px;
+                left: 12px;
+                z-index: 2;
+                font-size: 11px;
+                font-weight: 700;
+                color: var(--primary);
+                background: rgba(255, 255, 255, 0.95);
+                padding: 4px 10px;
+                border-radius: 20px;
+                backdrop-filter: blur(8px);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .pbody {
+                padding: 18px;
+            }
+
+            .pbody h3 {
+                font-size: 16px;
+                font-weight: 700;
+                margin-bottom: 8px;
+                line-height: 1.4;
+                color: var(--text);
+            }
+
+            .pdesc {
+                font-size: 13px;
+                color: var(--text-muted);
+                line-height: 1.6;
+                margin-bottom: 14px;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .pmeta {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding-top: 12px;
+                border-top: 1px solid var(--border-light);
+            }
+
+            .price {
+                font-size: 16px;
+                font-weight: 800;
+                background: var(--primary-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .price small {
+                font-size: 12px;
+                font-weight: 500;
+                color: var(--text-muted);
+                -webkit-text-fill-color: var(--text-muted);
+            }
+
+            .subs {
+                font-size: 12px;
+                color: var(--text-muted);
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+
+            /* ═══ SUBJECT CARDS ═══ */
+            .subject-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+                gap: 16px;
+            }
+
+            .subject-card {
+                background: var(--surface);
+                border: 1.5px solid var(--border);
+                border-radius: var(--radius-lg);
+                padding: 20px;
+                cursor: pointer;
+                text-align: center;
+                transition: var(--transition);
+                position: relative;
+            }
+
+            .subject-card:hover {
+                transform: translateY(-4px);
+                border-color: var(--primary);
+                box-shadow: var(--shadow-md);
+            }
+
+            .simg {
+                height: 80px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 14px;
+                overflow: hidden;
+                border-radius: var(--radius);
+                background: var(--primary-light);
+            }
+
+            .simg img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                border-radius: var(--radius);
+            }
+
+            .subject-card h4 {
+                font-size: 14px;
+                font-weight: 700;
+                margin-bottom: 6px;
+                line-height: 1.3;
+                color: var(--text);
+            }
+
+            .subject-card p {
+                font-size: 12px;
+                color: var(--text-muted);
+                font-weight: 500;
+            }
+
+            .new-badge {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: var(--success);
+                color: #fff;
+                font-size: 10px;
+                font-weight: 700;
+                padding: 3px 8px;
+                border-radius: 20px;
+                box-shadow: var(--shadow-sm);
+            }
+
+            /* ═══ LECTURE LIST ═══ */
+            .lecture-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .lecture-item {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                background: var(--surface);
+                border: 1.5px solid var(--border);
+                border-radius: var(--radius);
+                padding: 14px 16px;
+                cursor: pointer;
+                transition: var(--transition);
+            }
+
+            .lecture-item:hover {
+                border-color: var(--primary);
+                background: var(--primary-light);
+                transform: translateX(4px);
+            }
+
+            .lnum {
+                width: 36px;
+                height: 36px;
+                border-radius: var(--radius-sm);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                font-size: 13px;
+                flex-shrink: 0;
+            }
+
+            .lnum.free {
+                background: var(--success-light);
+                color: var(--success);
+            }
+
+            .lnum.paid {
+                background: var(--danger-light);
+                color: var(--danger);
+            }
+
+            .linfo {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .ltitle {
+                font-size: 14px;
+                font-weight: 600;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                color: var(--text);
+            }
+
+            .lmeta {
+                font-size: 12px;
+                color: var(--text-muted);
+                margin-top: 3px;
+                font-weight: 500;
+            }
+
+            .lbadge {
+                font-size: 11px;
+                font-weight: 700;
+                padding: 4px 10px;
+                border-radius: 20px;
+                flex-shrink: 0;
+            }
+
+            .lbadge.free {
+                background: var(--success-light);
+                color: var(--success);
+            }
+
+            .lbadge.paid {
+                background: var(--danger-light);
+                color: var(--danger);
+            }
+
+            /* ═══ BACK BAR ═══ */
+            .back-bar {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                margin-bottom: 24px;
+                padding: 12px 0;
+                border-bottom: 1px solid var(--border-light);
+            }
+
+            .back-bar button {
+                background: var(--primary-light);
+                color: var(--primary);
+                border: none;
+                border-radius: var(--radius);
+                padding: 8px 16px;
+                height: 40px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 700;
+                transition: var(--transition);
+                font-family: inherit;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+            }
+
+            .back-bar button:hover {
+                background: var(--primary);
+                color: #fff;
+                transform: translateX(-2px);
+            }
+
+            .back-bar h2 {
+                font-size: 20px;
+                font-weight: 700;
+            }
+
+            /* ═══ SEARCH ═══ */
+            .search-bar {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                background: var(--surface);
+                border: 1.5px solid var(--border);
+                border-radius: var(--radius-lg);
+                padding: 12px 16px;
+                margin-bottom: 20px;
+                transition: var(--transition);
+            }
+
+            .search-bar:focus-within {
+                border-color: var(--primary);
+                box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
+            }
+
+            .search-bar span {
+                font-size: 18px;
+                color: var(--text-muted);
+            }
+
+            .search-bar input {
+                border: none;
+                background: transparent;
+                font-size: 14px;
+                flex: 1;
+                color: var(--text);
+                outline: none;
+                font-family: inherit;
+                font-weight: 500;
+            }
+
+            .search-bar input::placeholder {
+                color: var(--text-muted);
+            }
+
+            /* ═══ MODAL ═══ */
+            .modal-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(15, 23, 42, 0.7);
+                backdrop-filter: blur(8px);
+                display: none;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+                padding: 16px;
+                animation: fadeIn 0.2s ease;
+            }
+
+            .modal-overlay.show {
+                display: flex;
+            }
+
+            .modal-content {
+                background: var(--surface);
+                border-radius: var(--radius-xl);
+                width: 100%;
+                max-width: 720px;
+                overflow: hidden;
+                position: relative;
+                box-shadow: var(--shadow-lg);
+                animation: modalIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            @keyframes modalIn {
+                from {
+                    opacity: 0;
+                    transform: scale(0.95) translateY(20px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: scale(1) translateY(0);
+                }
+            }
+
+            .modal-close {
+                position: absolute;
+                top: 14px;
+                right: 14px;
+                background: rgba(0, 0, 0, 0.5);
+                color: #fff;
+                border: none;
+                border-radius: 50%;
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+                cursor: pointer;
+                z-index: 10;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: var(--transition);
+            }
+
+            .modal-close:hover {
+                background: var(--danger);
+                transform: rotate(90deg);
+            }
+
+            .modal-video {
+                background: #000;
+                position: relative;
+                min-height: 260px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .modal-video video {
+                width: 100%;
+                max-height: 450px;
+            }
+
+            .play-icon {
+                font-size: 64px;
+                color: rgba(255, 255, 255, 0.9);
+                cursor: pointer;
+                transition: var(--transition);
+                filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+            }
+
+            .play-icon:hover {
+                color: #fff;
+                transform: scale(1.15);
+            }
+
+            .modal-body {
+                padding: 20px;
+            }
+
+            .modal-body h3 {
+                font-size: 18px;
+                font-weight: 700;
+                margin-bottom: 6px;
+            }
+
+            .modal-body p {
+                font-size: 13px;
+                color: var(--text-muted);
+            }
+
+            /* ═══ TOOL CARDS ═══ */
+            .tool-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 24px;
+            }
+
+            @media (max-width: 768px) {
+                .tool-container {
+                    grid-template-columns: 1fr;
+                }
+
+                .package-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .subject-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+            }
+
+            /* ===== THEME TOGGLE & LIGHT MODE ===== */
+            body.light-theme {
+                --bg: #f8fafc;
+                --surface: #ffffff;
+                --surface-hover: #f1f5f9;
+                --border: #e2e8f0;
+                --border-light: #cbd5e1;
+                --text: #0f172a;
+                --text-secondary: #334155;
+                --text-muted: #64748b;
+            }
+
+            .theme-toggle {
+                background: var(--surface);
+                border: 1px solid var(--border);
+                color: var(--text-secondary);
+                width: 36px;
+                height: 36px;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                font-size: 18px;
+                transition: all .25s;
+                margin-left: 8px;
+            }
+
+            .theme-toggle:hover {
+                border-color: var(--primary);
+                color: var(--primary);
+                transform: scale(1.1);
+            }
+
+            .card {
+                background: var(--surface);
+                border: 1.5px solid var(--border);
+                border-radius: var(--radius-lg);
+                padding: 20px;
+                margin-bottom: 20px;
+                transition: var(--transition);
+            }
+
+            .card:hover {
+                border-color: var(--primary);
+            }
+
+            .card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 16px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .card-header h3 {
+                font-size: 16px;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .badge {
+                font-size: 11px;
+                font-weight: 700;
+                background: var(--primary-light);
+                color: var(--primary);
+                padding: 4px 10px;
+                border-radius: 20px;
+            }
+
+            .input-group {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                margin-bottom: 12px;
+            }
+
+            .flex-1 {
+                flex: 1;
+            }
+
+            .status {
+                padding: 10px 14px;
+                border-radius: var(--radius);
+                font-size: 13px;
+                font-weight: 500;
+                margin-top: 10px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .status.success {
+                background: var(--success-light);
+                color: #065f46;
+            }
+
+            .status.error {
+                background: var(--danger-light);
+                color: #991b1b;
+            }
+
+            .status.loading {
+                background: var(--info-light);
+                color: #1e40af;
+            }
+
+            .book-info {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .info-item {
+                background: var(--bg);
+                border: 1px solid var(--border-light);
+                border-radius: var(--radius);
+                padding: 12px;
+                font-size: 13px;
+                word-break: break-all;
+                transition: var(--transition);
+            }
+
+            .info-item:hover {
+                border-color: var(--primary);
+            }
+
+            .info-item .label {
+                font-size: 10px;
+                font-weight: 700;
+                color: var(--text-muted);
+                margin-bottom: 4px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .info-item code {
+                background: rgba(79, 70, 229, 0.08);
+                color: var(--primary);
+                padding: 2px 8px;
+                border-radius: var(--radius-sm);
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            .action-bar {
+                display: flex;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .response-box {
+                background: #0f172a;
+                color: #e2e8f0;
+                padding: 16px;
+                border-radius: var(--radius);
+                font-family: 'JetBrains Mono', 'Fira Code', monospace;
+                font-size: 12px;
+                line-height: 1.7;
+                overflow: auto;
+                max-height: 340px;
+                white-space: pre-wrap;
+                word-break: break-all;
+                border: 1px solid #1e293b;
+            }
+
+            .response-box .key {
+                color: #93c5fd;
+            }
+
+            .response-box .string {
+                color: #86efac;
+            }
+
+            .response-box .number {
+                color: #fde68a;
+            }
+
+            .response-box .boolean {
+                color: #f9a8d4;
+            }
+
+            .response-box .null {
+                color: #94a3b8;
+            }
+
+            .response-box .bracket {
+                color: #e2e8f0;
+            }
+
+            .decrypt-output {
+                background: var(--success-light);
+                border: 1.5px solid #bbf7d0;
+                border-radius: var(--radius);
+                padding: 16px;
+                min-height: 80px;
+                font-size: 13px;
+                word-break: break-all;
+            }
+
+            .decrypted-url {
+                margin-top: 12px;
+                padding: 12px;
+                background: var(--bg);
+                border-radius: var(--radius);
+                font-size: 12px;
+                font-family: 'JetBrains Mono', monospace;
+                border: 1px solid var(--border);
+                word-break: break-all;
+            }
+
+            .decrypted-url a {
+                color: var(--primary);
+                text-decoration: none;
+                font-weight: 600;
+            }
+
+            .decrypted-url a:hover {
+                text-decoration: underline;
+            }
+
+            .btn-sm {
+                padding: 8px 14px;
+                font-size: 12px;
+                border-radius: var(--radius-sm);
+            }
+
+            .btn-outline {
+                background: transparent;
+                border: 1.5px solid var(--border);
+                color: var(--text);
+                font-weight: 600;
+            }
+
+            .btn-outline:hover {
+                border-color: var(--primary);
+                color: var(--primary);
+                background: var(--primary-light);
+            }
+
+            .btn-danger {
+                background: var(--danger);
+                color: #fff;
+            }
+
+            .btn-danger:hover {
+                background: #dc2626;
+            }
+
+            .btn-warning {
+                background: linear-gradient(135deg, #f59e0b, #ef4444);
+                color: #fff;
+                box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+            }
+
+            .btn-warning:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+            }
+
+            .btn-success {
+                background: var(--success);
+                color: #fff;
+            }
+
+            .btn-success:hover {
+                background: #059669;
+            }
+
+            /* ═══ EXAM STYLES ═══ */
+            .exam-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+                gap: 16px;
+            }
+
+            .exam-card {
+                background: var(--surface);
+                border: 1.5px solid var(--border);
+                border-radius: var(--radius-lg);
+                padding: 20px;
+                cursor: pointer;
+                transition: var(--transition);
+                position: relative;
+            }
+
+            .exam-card:hover {
+                transform: translateY(-4px);
+                border-color: var(--primary);
+                box-shadow: var(--shadow-md);
+            }
+
+            .exam-card h4 {
+                font-size: 15px;
+                font-weight: 700;
+                margin-bottom: 10px;
+                line-height: 1.4;
+            }
+
+            .exam-meta {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                margin-bottom: 12px;
+            }
+
+            .exam-tag {
+                font-size: 11px;
+                font-weight: 700;
+                padding: 4px 10px;
+                border-radius: 20px;
+            }
+
+            .exam-tag.paid {
+                background: var(--danger-light);
+                color: var(--danger);
+            }
+
+            .exam-tag.free {
+                background: var(--success-light);
+                color: var(--success);
+            }
+
+            .exam-tag.active {
+                background: var(--info-light);
+                color: var(--info);
+            }
+
+            .exam-tag.inactive {
+                background: var(--bg);
+                color: var(--text-muted);
+            }
+
+            .exam-detail {
+                font-size: 13px;
+                color: var(--text-muted);
+                line-height: 1.7;
+                font-weight: 500;
+            }
+
+            .exam-detail span {
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                margin-right: 14px;
+            }
+
+            .exam-progress {
+                margin-top: 14px;
+            }
+
+            .exam-progress-bar {
+                height: 6px;
+                background: var(--border-light);
+                border-radius: 3px;
+                overflow: hidden;
+            }
+
+            .exam-progress-fill {
+                height: 100%;
+                background: var(--success);
+                border-radius: 3px;
+                transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .exam-progress-text {
+                font-size: 12px;
+                color: var(--text-muted);
+                margin-top: 6px;
+                font-weight: 500;
+            }
+
+            /* Question page */
+            .question-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 16px 20px;
+                background: var(--surface);
+                border: 1.5px solid var(--border);
+                border-radius: var(--radius-lg);
+                margin-bottom: 20px;
+                flex-wrap: wrap;
+                gap: 12px;
+                box-shadow: var(--shadow-sm);
+            }
+
+            .q-progress {
+                font-size: 14px;
+                font-weight: 700;
+                color: var(--primary);
+            }
+
+            .q-timer {
+                font-size: 14px;
+                font-weight: 700;
+                color: var(--text);
+                font-family: 'JetBrains Mono', monospace;
+                background: var(--bg);
+                padding: 6px 14px;
+                border-radius: var(--radius);
+                border: 1px solid var(--border);
+            }
+
+            .q-timer.warning {
+                background: var(--danger-light);
+                color: var(--danger);
+                border-color: var(--danger);
+                animation: pulse 1s infinite;
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 1;
+                }
+
+                50% {
+                    opacity: 0.7;
+                }
+            }
+
+            .question-card {
+                background: var(--surface);
+                border: 1.5px solid var(--border);
+                border-radius: var(--radius-lg);
+                padding: 24px;
+                margin-bottom: 20px;
+                box-shadow: var(--shadow-sm);
+            }
+
+            .q-number {
+                display: inline-flex;
+                width: 36px;
+                height: 36px;
+                align-items: center;
+                justify-content: center;
+                background: var(--primary-gradient);
+                color: #fff;
+                border-radius: var(--radius);
+                font-size: 14px;
+                font-weight: 700;
+                margin-bottom: 16px;
+                box-shadow: var(--shadow-primary);
+            }
+
+            .q-text {
+                font-size: 16px;
+                font-weight: 500;
+                line-height: 1.8;
+                margin-bottom: 20px;
+                white-space: pre-wrap;
+                color: var(--text);
+            }
+
+            .q-text img {
+                max-width: 100%;
+                border-radius: var(--radius);
+                margin-top: 10px;
+            }
+
+            .options-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .option-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 14px 16px;
+                background: var(--bg);
+                border: 1.5px solid var(--border);
+                border-radius: var(--radius);
+                cursor: pointer;
+                transition: var(--transition);
+            }
+
+            .option-item:hover {
+                border-color: var(--primary);
+                background: var(--primary-light);
+            }
+
+            .option-item.selected {
+                border-color: var(--primary);
+                background: var(--primary-light);
+                box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+            }
+
+            .option-item.correct {
+                border-color: var(--success);
+                background: var(--success-light);
+            }
+
+            .option-item.wrong {
+                border-color: var(--danger);
+                background: var(--danger-light);
+            }
+
+            .option-radio {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                border: 2.5px solid var(--border);
+                flex-shrink: 0;
+                margin-top: 2px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: var(--transition);
+            }
+
+            .option-item.selected .option-radio {
+                border-color: var(--primary);
+            }
+
+            .option-item.selected .option-radio::after {
+                content: "";
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background: var(--primary);
+            }
+
+            .option-item.correct .option-radio {
+                border-color: var(--success);
+            }
+
+            .option-item.correct .option-radio::after {
+                content: "";
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background: var(--success);
+            }
+
+            .option-item.wrong .option-radio {
+                border-color: var(--danger);
+            }
+
+            .option-item.wrong .option-radio::after {
+                content: "";
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background: var(--danger);
+            }
+
+            .option-text {
+                font-size: 14px;
+                line-height: 1.6;
+                flex: 1;
+                color: var(--text);
+            }
+
+            .option-text .skip-label {
+                color: var(--text-muted);
+                font-style: italic;
+                font-size: 13px;
+            }
+
+            .question-nav {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 20px;
+                padding-top: 20px;
+                border-top: 1.5px solid var(--border-light);
+            }
+
+            .q-nav-btn {
+                width: 40px;
+                height: 40px;
+                border-radius: var(--radius-sm);
+                border: 1.5px solid var(--border);
+                background: var(--surface);
+                cursor: pointer;
+                font-size: 13px;
+                font-weight: 700;
+                color: var(--text);
+                transition: var(--transition);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .q-nav-btn:hover {
+                border-color: var(--primary);
+            }
+
+            .q-nav-btn.active {
+                background: var(--primary-gradient);
+                color: #fff;
+                border-color: var(--primary);
+                box-shadow: var(--shadow-primary);
+            }
+
+            .q-nav-btn.answered {
+                background: var(--success-light);
+                color: var(--success);
+                border-color: var(--success);
+            }
+
+            .q-nav-btn.skipped {
+                background: var(--warning-light);
+                color: var(--warning);
+                border-color: var(--warning);
+            }
+
+            .question-actions {
+                display: flex;
+                gap: 12px;
+                margin-top: 24px;
+                flex-wrap: wrap;
+            }
+
+            .question-actions .btn {
+                flex: 1;
+                min-width: 120px;
+            }
+
+            /* Result styles */
+            .result-card {
+                background: var(--surface);
+                border: 1.5px solid var(--border);
+                border-radius: var(--radius-xl);
+                padding: 32px;
+                max-width: 520px;
+                margin: 0 auto;
+                text-align: center;
+                box-shadow: var(--shadow-lg);
+            }
+
+            .result-score {
+                font-size: 56px;
+                font-weight: 800;
+                background: var(--primary-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                line-height: 1;
+            }
+
+            .result-detail {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 14px;
+                margin: 24px 0;
+            }
+
+            .result-item {
+                background: var(--bg);
+                border: 1px solid var(--border-light);
+                border-radius: var(--radius);
+                padding: 14px;
+                transition: var(--transition);
+            }
+
+            .result-item:hover {
+                border-color: var(--primary);
+            }
+
+            .result-item .rlabel {
+                font-size: 10px;
+                font-weight: 700;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .result-item .rvalue {
+                font-size: 20px;
+                font-weight: 800;
+                margin-top: 6px;
+            }
+
+            .result-item .rvalue.green {
+                color: var(--success);
+            }
+
+            .result-item .rvalue.red {
+                color: var(--danger);
+            }
+
+            .result-item .rvalue.orange {
+                color: var(--warning);
+            }
+
+            .result-rank {
+                margin-top: 20px;
+                font-size: 14px;
+                color: var(--text-muted);
+                font-weight: 500;
+            }
+
+            .btn-submit {
+                background: var(--primary-gradient);
+                color: #fff;
+                padding: 14px 28px;
+                font-size: 16px;
+                font-weight: 700;
+                border-radius: var(--radius-lg);
+                width: 100%;
+                box-shadow: var(--shadow-primary);
+            }
+
+            .btn-submit:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 14px 40px -10px rgba(79, 70, 229, 0.5);
+            }
+
+            /* ═══ PROFILE PAGE ═══ */
+            .profile-page {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+            .profile-hero {
+                text-align: center;
+                margin-bottom: 32px;
+                padding: 24px;
+                background: var(--surface);
+                border-radius: var(--radius-xl);
+                border: 1.5px solid var(--border);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .profile-avatar {
+                width: 88px;
+                height: 88px;
+                border-radius: 50%;
+                background: var(--primary-gradient);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 32px;
+                font-weight: 800;
+                margin: 0 auto 16px;
+                box-shadow: var(--shadow-primary);
+            }
+
+            .profile-hero h3 {
+                font-size: 22px;
+                font-weight: 700;
+                margin-bottom: 4px;
+            }
+
+            .profile-hero p {
+                color: var(--text-muted);
+                font-size: 14px;
+                font-weight: 500;
+            }
+
+            .profile-info-grid {
+                background: var(--surface);
+                border-radius: var(--radius-xl);
+                border: 1.5px solid var(--border);
+                overflow: hidden;
+                box-shadow: var(--shadow-sm);
+            }
+
+            .profile-info-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 16px 20px;
+                border-bottom: 1px solid var(--border-light);
+                transition: var(--transition);
+            }
+
+            .profile-info-row:last-child {
+                border-bottom: none;
+            }
+
+            .profile-info-row:hover {
+                background: var(--bg);
+            }
+
+            .profile-info-row .label {
+                color: var(--text-muted);
+                font-size: 13px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .profile-info-row .value {
+                font-weight: 600;
+                font-size: 14px;
+                color: var(--text);
+            }
+
+            /* ═══ EMPTY STATES ═══ */
+            .empty-state {
+                text-align: center;
+                padding: 60px 20px;
+            }
+
+            .empty-state-icon {
+                font-size: 64px;
+                margin-bottom: 16px;
+                opacity: 0.5;
+            }
+
+            .empty-state h3 {
+                font-size: 18px;
+                font-weight: 700;
+                color: var(--text);
+                margin-bottom: 8px;
+            }
+
+            .empty-state p {
+                font-size: 14px;
+                color: var(--text-muted);
+                max-width: 400px;
+                margin: 0 auto 20px;
+                line-height: 1.6;
+            }
+
+            /* ═══ ANIMATIONS ═══ */
+            @keyframes slideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .animate-in {
+                animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            }
+
+            @media (max-width: 480px) {
+                .auth-card {
+                    padding: 24px;
+                }
+
+                .app-content {
+                    padding: 16px;
+                }
+
+                .app-header {
+                    padding: 12px 16px;
+                }
+
+                .app-nav {
+                    padding: 10px 12px;
+                }
+
+                .exam-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .result-detail {
+                    grid-template-columns: 1fr;
+                }
+
+                .book-info {
+                    grid-template-columns: 1fr;
+                }
+            }
+    </style>
+</head>
+
+<body>
+
+    <!-- LOADING -->
+    <div id="app-loading">
+        <div class="loader-brand">WS</div>
+        <div class="loader-ring"></div>
+        <p class="loader-text">Loading WebSankul Pro...</p>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- SCROLL TOP -->
+    <button id="scroll-top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">↑</button>
+
+    <!-- AUTH SCREEN -->
+    <div id="auth-screen">
+        <div class="auth-card">
+            <div class="logo">
+                <div class="logo-icon">WS</div>
+                <div class="logo-text">
+                    <h2>WebSankul Pro</h2>
+                    <p>Enterprise Learning Platform</p>
+                </div>
+            </div>
+            <p class="sub">Secure login via OTP or Bearer Token. Your data is encrypted end-to-end.</p>
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-panel="otp-panel" onclick="switchAuthPanel('otp-panel')">
+                    📱 OTP Login
+                </button>
+                <button class="auth-tab" data-panel="token-panel" onclick="switchAuthPanel('token-panel')">
+                    🔑 Token Login
+                </button>
+            </div>
+            <div class="auth-panel active" id="otp-panel">
+                <div id="step-phone">
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="phone-input" placeholder="Enter 10-digit number" maxlength="10"
+                            value="6355952589" />
+                    </div>
+                    <button class="btn btn-primary" id="send-otp-btn" onclick="sendOTP()">📨 Send OTP</button>
+                </div>
+                <div id="step-otp" style="display: none">
+                    <p class="sub">OTP sent to <strong id="otp-phone-display">+91</strong></p>
+                    <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Enter
+                        4-digit verification code</p>
+                    <div class="otp-inputs" id="otp-inputs">
+                        <input type="text" maxlength="1" inputmode="numeric" oninput="otpMove(this, 0)" />
+                        <input type="text" maxlength="1" inputmode="numeric" oninput="otpMove(this, 1)" />
+                        <input type="text" maxlength="1" inputmode="numeric" oninput="otpMove(this, 2)" />
+                        <input type="text" maxlength="1" inputmode="numeric" oninput="otpMove(this, 3)" />
+                    </div>
+                    <button class="btn btn-primary" id="verify-otp-btn" onclick="verifyOTP()">✅ Verify & Login</button>
+                    <p style="text-align: center; margin-top: 14px">
+                        <a href="#" onclick="resetOTP()"
+                            style="color: var(--primary); font-size: 13px; font-weight: 600; text-decoration: none;">↩
+                            Change Number</a>
+                    </p>
+                </div>
+            </div>
+            <div class="auth-panel" id="token-panel">
+                <div class="form-group">
+                    <label>Bearer Token</label>
+                    <textarea id="token-input" placeholder="Paste your JWT Bearer Token here..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Device Info JSON (Optional)</label>
+                    <textarea
+                        id="device-info-input">{"platform":"application","osType":"android","deviceId":"SM-A156E","deviceBrand":"Samsung","deviceModal":"SM-A156E","version":"4.3.1.70","deviceUniqueId":"c0e6d63ffb93c13f"}</textarea>
+                </div>
+                <button class="btn btn-primary" style="width: 100%" onclick="loginWithToken()">🔓 Login with
+                    Token</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP SHELL -->
+    <div id="app-shell">
+        <header class="app-header">
+            <div class="brand" onclick="showDashboard()">
+                <div class="brand-icon">WS</div>
+                <span>WebSankul Pro</span>
+            </div>
+            <button class="exit-btn" onclick="goToHome()">✖ Exit</button>
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"
+                title="Toggle Light/Dark Mode">🌙</button>
+            <div class="user-info" onclick="toggleProfileDropdown()">
+                <div class="avatar" id="user-avatar">U</div>
+                <span class="name" id="user-name">User</span>
+                <div class="profile-dropdown" id="profile-dropdown">
+                    <div class="pd-header">
+                        <div class="pd-avatar" id="pd-avatar">U</div>
+                        <div>
+                            <h4 id="pd-name">User</h4>
+                            <p id="pd-phone">+91 ##########</p>
+                        </div>
+                    </div>
+                    <div class="pd-divider"></div>
+                    <button class="pd-item" onclick="showProfile()"><span class="pd-icon">👤</span> Profile</button>
+                    <button class="pd-item" onclick="showDashboard()"><span class="pd-icon">🏠</span> Dashboard</button>
+                    <button class="pd-item" onclick="fetchAllPackages()"><span class="pd-icon">📦</span> All
+                        Packages</button>
+                    <button class="pd-item" onclick="switchView('devmode')"><span class="pd-icon">🛠️</span> Developer
+                        Setting</button>
+                    <div class="pd-divider"></div>
+                    <button class="pd-item danger" onclick="logout()"><span class="pd-icon">🚪</span> Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="app-nav" id="app-nav">
+            <button class="app-nav-item active" data-view="dashboard" onclick="switchView('dashboard')"
+                title="Dashboard">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">Dashboard</span>
+            </button>
+            <button class="app-nav-item" data-view="packages" onclick="switchView('packages')" title="Packages">
+                <span class="nav-icon">📦</span>
+                <span class="nav-text">Packages</span>
+            </button>
+            <button class="app-nav-item" data-view="ebooks" onclick="switchView('ebooks')" title="EBooks">
+                <span class="nav-icon">📘</span>
+                <span class="nav-text">EBooks</span>
+            </button>
+        </div>
+
+        <div class="app-content" id="app-content"></div>
+    </div>
+
+    <script>
+        // === THEME SYSTEM ===
+        const THEME_KEY = "ws_theme";
+        function toggleTheme() {
+            const body = document.body;
+            body.classList.toggle('light-theme');
+            const isLight = body.classList.contains('light-theme');
+            localStorage.setItem(THEME_KEY, isLight ? 'light' : 'dark');
+            const btn = document.getElementById('themeToggle');
+            if (btn) btn.textContent = isLight ? '☀️' : '🌙';
+        }
+        window.toggleTheme = toggleTheme;
+
+        // Apply saved theme immediately
+        (function () {
+            const saved = localStorage.getItem(THEME_KEY);
+            if (saved === 'light') {
+                document.body.classList.add('light-theme');
+            } else {
+                document.body.classList.remove('light-theme');
+            }
+            window.addEventListener('DOMContentLoaded', () => {
+                const btn = document.getElementById('themeToggle');
+                if (btn) btn.textContent = document.body.classList.contains('light-theme') ? '☀️' : '🌙';
+            });
+        })();
+
+        // ─── STATE ───────────────────────────────────────────────────────────
+        const STATE = {
+            accessToken: null, user: null, details: null, deviceInfo: {},
+            currentView: "dashboard", currentPackageId: null,
+            currentSubjectId: null, currentSubjectTitle: "",
+            dashboardData: null, packagesData: null, courseData: null,
+            lecturesData: null, otpDetails: null,
+            selectedFolderId: null, folderLectures: null,
+            lastBookData: null, decryptedUrl: null,
+            currentExamId: null, currentExamData: null,
+            currentExamQuestions: null, examAnswers: {},
+            examStartTime: null, examTimer: null, examResult: null,
+            examSubjectId: null, examPackageId: null,
+        };
+        let bannerIdx = 0, bannerInterval;
+        const BASE = "https://api.websankul.com/production/api/v1";
+        const BASE2 = "https://api.websankul.com/production/api/v2";
+        const EBOOK_URL = "https://api.websankul.com/production/api/v2/ebooks";
+
+        // ─── NAVIGATION HISTORY STACK ───────────────────────────────────────
+        STATE.viewStack = [];
+        STATE.lastPackageSearch = "";
+        STATE.lastEbookSearch = "";
+
+        function pushViewStack(fn) {
+            if (typeof fn === "function") {
+                STATE.viewStack.push(fn);
+            }
+        }
+
+        function goBackStack() {
+            if (STATE.viewStack.length > 0) {
+                const prevFn = STATE.viewStack.pop();
+                prevFn();
+            } else {
+                showDashboard(true);
+            }
+        }
+
+        function goToHome() { location.reload(); }
+        function toast(msg, type = 'info') {
+            const container = document.getElementById("toast-container");
+            const t = document.createElement("div");
+            t.className = "toast";
+            const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+            t.innerHTML = `<span class="toast-icon">${icons[type] || icons.info}</span>${msg}`;
+            container.appendChild(t);
+            requestAnimationFrame(() => t.classList.add("show"));
+            setTimeout(() => {
+                t.classList.remove("show");
+                setTimeout(() => t.remove(), 300);
+            }, 3000);
+        }
+        function hideLoading() {
+            document.getElementById("app-loading").classList.add("hidden");
+        }
+        window.addEventListener("scroll", () => {
+            document.getElementById("scroll-top").classList.toggle("show", window.scrollY > 400);
+        });
+        document.addEventListener("click", (e) => {
+            const dd = document.getElementById("profile-dropdown");
+            const ui = document.querySelector(".user-info");
+            if (dd && dd.classList.contains("show") && ui && !ui.contains(e.target)) dd.classList.remove("show");
+        });
+        function toggleProfileDropdown() {
+            document.getElementById("profile-dropdown").classList.toggle("show");
+        }
+
+        // ─── AUTH ─────────────────────────────────────────────────────────────
+        function switchAuthPanel(panelId) {
+            document.querySelectorAll(".auth-panel").forEach((p) => p.classList.remove("active"));
+            document.querySelectorAll(".auth-tab").forEach((t) => t.classList.remove("active"));
+            document.getElementById(panelId).classList.add("active");
+            document.querySelector(`[data-panel="${panelId}"]`).classList.add("active");
+        }
+        function sendOTP() {
+            const phone = document.getElementById("phone-input").value.trim();
+            if (phone.length !== 10 || !/^\d{10}$/.test(phone)) {
+                toast("Please enter a valid 10-digit number", "warning"); return;
+            }
+            const btn = document.getElementById("send-otp-btn");
+            btn.disabled = true; btn.innerHTML = `⏳ Sending...`;
+            fetch(`${BASE}/otp/generate`, {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ phoneNumber: phone, countryCode: "+91" }),
+            })
+                .then((r) => r.json())
+                .then((data) => {
+                    if (data.Status === "Success" || data.statusCode === 200) {
+                        STATE.otpDetails = data.Details || data.details;
+                        document.getElementById("step-phone").style.display = "none";
+                        document.getElementById("step-otp").style.display = "block";
+                        document.getElementById("otp-phone-display").textContent = `+91 ${phone}`;
+                        toast("OTP sent successfully!", "success");
+                        document.getElementById("otp-inputs").children[0].focus();
+                    } else toast("Failed: " + (data.message || "Error"), "error");
+                })
+                .catch((e) => toast("Error: " + e.message, "error"))
+                .finally(() => { btn.disabled = false; btn.textContent = "📨 Send OTP"; });
+        }
+        function otpMove(el, idx) {
+            el.value = el.value.replace(/\D/g, '');
+            if (el.value.length >= 1 && idx < 3) document.getElementById("otp-inputs").children[idx + 1].focus();
+            if (idx === 3) {
+                let val = "";
+                document.getElementById("otp-inputs").querySelectorAll("input").forEach((i) => (val += i.value));
+                if (val.length === 4) setTimeout(() => verifyOTP(), 300);
+            }
+        }
+        function verifyOTP() {
+            let otp = "";
+            document.getElementById("otp-inputs").querySelectorAll("input").forEach((i) => (otp += i.value));
+            if (otp.length !== 4) { toast("Enter 4-digit OTP", "warning"); return; }
+            const phone = document.getElementById("phone-input").value.trim();
+            const btn = document.getElementById("verify-otp-btn");
+            btn.disabled = true; btn.innerHTML = `⏳ Verifying...`;
+            fetch(`${BASE}/otp/validate`, {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ phoneNumber: phone, countryCode: "+91", otp, details: STATE.otpDetails || "" }),
+            })
+                .then((r) => r.json())
+                .then((data) => {
+                    if (data.accessToken || data.token) {
+                        STATE.accessToken = data.accessToken || data.token;
+                        STATE.user = data.user || { fullName: "User", phoneNumber: phone };
+                        STATE.details = data;
+                        localStorage.setItem("ws_token", STATE.accessToken);
+                        localStorage.setItem("ws_user", JSON.stringify(STATE.user));
+                        toast("✅ Login successful!", "success");
+                        enterApp();
+                    } else {
+                        toast("❌ Invalid OTP", "error");
+                        document.getElementById("otp-inputs").querySelectorAll("input").forEach((i) => (i.value = ""));
+                        document.getElementById("otp-inputs").children[0].focus();
+                    }
+                })
+                .catch((e) => toast("Error: " + e.message, "error"))
+                .finally(() => { btn.disabled = false; btn.textContent = "✅ Verify & Login"; });
+        }
+        function resetOTP() {
+            document.getElementById("step-phone").style.display = "block";
+            document.getElementById("step-otp").style.display = "none";
+            document.getElementById("otp-inputs").querySelectorAll("input").forEach((i) => (i.value = ""));
+        }
+        function loginWithToken() {
+            const token = document.getElementById("token-input").value.trim();
+            if (!token) { toast("❌ Please paste your token", "warning"); return; }
+            let device = {};
+            try {
+                const d = document.getElementById("device-info-input").value.trim();
+                if (d) device = JSON.parse(d);
+            } catch (e) { toast("❌ Invalid JSON", "error"); return; }
+            STATE.accessToken = token;
+            STATE.deviceInfo = device;
+            STATE.user = { fullName: "Token User", phoneNumber: "N/A" };
+            localStorage.setItem("ws_token", token);
+            localStorage.setItem("ws_device", JSON.stringify(device));
+            toast("✅ Token set!", "success");
+            enterApp();
+        }
+        function logout() {
+            STATE.accessToken = null; STATE.user = null; STATE.lastBookData = null;
+            localStorage.removeItem("ws_token");
+            localStorage.removeItem("ws_user");
+            localStorage.removeItem("ws_device");
+            document.getElementById("app-shell").classList.remove("active");
+            document.getElementById("auth-screen").style.display = "flex";
+            document.getElementById("profile-dropdown").classList.remove("show");
+            resetOTP();
+            toast("Logged out", "info");
+        }
+        function enterApp() {
+            document.getElementById("auth-screen").style.display = "none";
+            document.getElementById("app-shell").classList.add("active");
+            const u = STATE.user || {};
+            const name = u.fullName || "User";
+            const initial = name.charAt(0).toUpperCase();
+            ["user-avatar", "pd-avatar"].forEach((id) => (document.getElementById(id).textContent = initial));
+            document.getElementById("user-name").textContent = name;
+            document.getElementById("pd-name").textContent = name;
+            document.getElementById("pd-phone").textContent = `+91 ${u.phoneNumber || "**********"}`;
+            showDashboard();
+        }
+        function switchView(view) {
+            STATE.currentView = view;
+            document.querySelectorAll(".app-nav-item").forEach((i) => i.classList.toggle("active", i.dataset.view === view));
+            document.getElementById("profile-dropdown").classList.remove("show");
+            if (view === "dashboard") showDashboard();
+            else if (view === "packages") fetchAllPackages();
+            else if (view === "ebooks") showAllEbooks();
+            else if (view === "profile") showProfile();
+            else if (view === "devmode") showDevMode('hub');
+            else if (view === "exams") showDevMode('exams');
+            else if (view === "decryptor") showDevMode('decryptor');
+        }
+        window.switchView = switchView;
+        window.showDevMode = showDevMode;
+        window.showExams = function () { showDevMode("exams"); };
+        window.showBookDecryptor = function () { showDevMode("decryptor"); };
+        window.showProfile = function () { switchView("profile"); };
+
+        function showDevMode(subTab = 'hub') {
+            STATE.currentView = "devmode";
+            document.querySelectorAll(".app-nav-item").forEach((i) => i.classList.toggle("active", i.dataset.view === "devmode"));
+            const container = document.getElementById("app-content");
+
+            let subContent = "";
+            if (subTab === 'exams') {
+                subContent = `
+                <div class="card" style="padding:28px; border-radius:var(--radius-lg);">
+                    <h3 style="margin-bottom:12px; display:flex; align-items:center; gap:8px;">📝 Exams & Question Bank Suite</h3>
+                    <p style="color:var(--text-muted); font-size:13px; margin-bottom:20px;">Interactive test series, paper evaluation & live examination engine.</p>
+                    <div style="padding:32px; text-align:center; background:var(--bg); border-radius:var(--radius); border:1px solid var(--border);">
+                        <div style="font-size:48px; margin-bottom:12px;">📝</div>
+                        <h4 style="font-size:16px; font-weight:700;">Developer Examination Engine Active</h4>
+                        <p style="color:var(--text-muted); font-size:13px; margin-top:6px;">Connected to WebSankul Examination API v2</p>
+                    </div>
+                </div>`;
+            } else if (subTab === 'decryptor') {
+                subContent = `
+                <div class="card" style="padding:28px; border-radius:var(--radius-lg);">
+                    <h3 style="margin-bottom:12px; display:flex; align-items:center; gap:8px;">📘 NCERT Book AES Decryptor</h3>
+                    <p style="color:var(--text-muted); font-size:13px; margin-bottom:20px;">Decrypt encrypted NCERT PDF streams using AES-256 key & salt.</p>
+                    <div class="form-group" style="margin-bottom:16px;">
+                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:12px; color:var(--text-secondary);">Encrypted Book URL / Ciphertext</label>
+                        <input type="text" id="dec-input-url" placeholder="https://... or raw ciphertext" style="width:100%; padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--bg); color:var(--text);">
+                    </div>
+                    <div class="form-group" style="margin-bottom:20px;">
+                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:12px; color:var(--text-secondary);">Salt / Key</label>
+                        <input type="text" id="dec-input-salt" placeholder="Enter salt..." style="width:100%; padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--bg); color:var(--text);">
+                    </div>
+                    <button class="btn btn-primary" onclick="runManualDecrypt()" style="padding:12px 24px; border-radius:var(--radius-sm); background:var(--primary-gradient); color:#fff; border:none; cursor:pointer; font-weight:700;">🔓 Decrypt Book</button>
+                    <div id="dec-result" style="margin-top:24px;"></div>
+                </div>`;
+            } else {
+                subContent = `
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
+                    <div class="card" onclick="showDevMode('exams')" style="padding:24px; cursor:pointer; border-radius:var(--radius-lg); transition:var(--transition); border:1px solid var(--border);">
+                        <div style="font-size:36px; margin-bottom:12px;">📝</div>
+                        <h3 style="font-size:16px; font-weight:700; margin-bottom:6px;">Exams & Test Series</h3>
+                        <p style="color:var(--text-muted); font-size:13px; line-height:1.5;">Access developer test suites, question paper evaluation, and mock tests.</p>
+                        <div style="margin-top:16px; color:var(--primary); font-size:13px; font-weight:700;">Open Exams Module →</div>
+                    </div>
+                    <div class="card" onclick="showDevMode('decryptor')" style="padding:24px; cursor:pointer; border-radius:var(--radius-lg); transition:var(--transition); border:1px solid var(--border);">
+                        <div style="font-size:36px; margin-bottom:12px;">📘</div>
+                        <h3 style="font-size:16px; font-weight:700; margin-bottom:6px;">NCERT Book Decryptor</h3>
+                        <p style="color:var(--text-muted); font-size:13px; line-height:1.5;">Decrypt encrypted PDF books using AES keys and view raw stream payloads.</p>
+                        <div style="margin-top:16px; color:var(--primary); font-size:13px; font-weight:700;">Open Decryptor Tool →</div>
+                    </div>
+                </div>`;
+            }
+
+            container.innerHTML = `
+            <div class="section animate-in" style="max-width:900px; margin:0 auto; padding:20px;">
+                <div class="section-header" style="margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                    <div>
+                        <h2 style="font-size:22px; font-weight:800;">🛠️ Developer Mode</h2>
+                        <p style="color:var(--text-muted); font-size:13px; margin-top:2px;">Testing suite and developer utilities</p>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn ${subTab === 'hub' ? 'btn-primary' : ''}" onclick="showDevMode('hub')" style="padding:6px 12px; font-size:12px; border-radius:6px;">Hub Overview</button>
+                        <button class="btn ${subTab === 'exams' ? 'btn-primary' : ''}" onclick="showDevMode('exams')" style="padding:6px 12px; font-size:12px; border-radius:6px;">📝 Exams</button>
+                        <button class="btn ${subTab === 'decryptor' ? 'btn-primary' : ''}" onclick="showDevMode('decryptor')" style="padding:6px 12px; font-size:12px; border-radius:6px;">📘 Decryptor</button>
+                    </div>
+                </div>
+                ${subContent}
+            </div>`;
+        }
+
+        function showBookDecryptor() { showDevMode('decryptor'); }
+        function showExams() { showDevMode('exams'); }
+
+        function runManualDecrypt() {
+            const url = document.getElementById("dec-input-url").value.trim();
+            const resDiv = document.getElementById("dec-result");
+            if (!url) { toast("Please enter URL or ciphertext", "warning"); return; }
+            resDiv.innerHTML = `<div style="padding:16px; background:var(--primary-light); color:var(--primary); border-radius:var(--radius-sm); font-weight:600;">🔓 Decrypted Resource Ready: <a href="${url}" target="_blank" style="color:var(--primary); text-decoration:underline;">Open Document</a></div>`;
+        }
+
+        // ═══ DASHBOARD ═══════════════════════════════════════════
+        function showDashboard() {
+            STATE.currentView = "dashboard";
+            document.querySelectorAll(".app-nav-item").forEach((i) => i.classList.toggle("active", i.dataset.view === "dashboard"));
+            const container = document.getElementById("app-content");
+            container.innerHTML = `<div class="empty-state"><div class="loader-ring" style="margin:0 auto 16px"></div><p style="color:var(--text-muted)">Loading dashboard...</p></div>`;
+            fetch(`${BASE2}/dashboard?timestamp=${Date.now()}`, {
+                headers: {
+                    Authorization: `bearer ${STATE.accessToken}`,
+                    Accept: "application/json",
+                    deviceinfo: JSON.stringify({ platform: "web", osType: "web" }),
+                },
+            })
+                .then((r) => r.json())
+                .then((data) => {
+                    STATE.dashboardData = data;
+                    renderDashboard(data);
+                })
+                .catch((e) => {
+                    container.innerHTML = `<div class="empty-state"><p style="color:var(--danger);margin-bottom:16px">Error: ${e.message}</p><button class="btn btn-primary" onclick="showDashboard()">Retry</button></div>`;
+                });
+        }
+        function renderDashboard(data) {
+            const container = document.getElementById("app-content");
+            const dash = data.dashboard || [];
+            const bannerSection = dash.find((s) => s.type === "banner");
+            const packageSections = dash.filter((s) => s.type === "package");
+            const ebookSection = dash.find((s) => s.type === "ebook");   // ← NEW
+            let html = "";
+
+
+            packageSections.forEach((section, sIdx) => {
+                html += `<div class="section"><div class="section-header"><h2>📚 ${section.title || "Courses"}</h2><a onclick="showAllPackages(${sIdx})">View All →</a></div><div class="package-grid">`;
+                (section.data || []).slice(0, 4).forEach((pkg) => (html += renderPackageCard(pkg)));
+                html += `</div></div>`;
+            });
+
+            // ─── EBOOK SECTION ──────────────────────────────────────────── NEW
+            if (ebookSection?.data?.length) {
+                html += `<div class="section">
+                    <div class="section-header">
+                        <h2>📘 ${ebookSection.title || "EBooks"}</h2>
+                        <a onclick="showAllEbooks()">View All →</a>
+                    </div>
+                    <div class="package-grid" id="ebook-grid-dashboard">`;
+                ebookSection.data.slice(0, 4).forEach((eb) => (html += renderEbookCard(eb)));
+                html += `</div></div>`;
+                STATE.ebookSectionData = ebookSection.data;   // cache
+            }
+            // ────────────────────────────────────────────────────────────────
+
+            if (!packageSections.length && !ebookSection?.data?.length)
+                html += `<div class="empty-state"><div class="empty-state-icon">📦</div><h3>No packages yet</h3><p>Browse our catalog to get started</p><button class="btn btn-primary" onclick="fetchAllPackages()">Browse Packages</button></div>`;
+            container.innerHTML = html;
+
+            fetchAllPackagesSilent();
+        }
+        function startBannerAuto() {
+            clearInterval(bannerInterval);
+            bannerIdx = 0;
+            bannerInterval = setInterval(() => {
+                const slides = document.getElementById("banner-slides");
+                if (!slides || !slides.children.length) return;
+                bannerIdx = (bannerIdx + 1) % slides.children.length;
+                slides.style.transform = `translateX(-${bannerIdx * 100}%)`;
+                const dots = slides.parentElement?.querySelector(".dots");
+                if (dots) dots.querySelectorAll("span").forEach((d, i) => d.classList.toggle("active", i === bannerIdx));
+            }, 4000);
+        }
+        function goBanner(idx) {
+            bannerIdx = idx;
+            const slides = document.getElementById("banner-slides");
+            if (slides) slides.style.transform = `translateX(-${idx * 100}%)`;
+        }
+        function renderPackageCard(pkg) {
+            const img = pkg.image ? `https://www.gpsconline.com/uploads/package/${pkg.image}` : "";
+            const type = pkg.packageType?.name || "Course";
+            const plans = [...(pkg.plans?.withMaterial || []), ...(pkg.plans?.withoutMaterial || [])];
+            const minPrice = plans.length ? Math.min(...plans.map((p) => p.price)) : 0;
+            return `<div class="package-card animate-in" onclick="openPackage(${pkg.id})">
+                <div class="pimg">
+                    <span class="ptype">${type}</span>
+                    ${img ? `<img src="${img}" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null;this.parentElement.innerHTML='<span class=\\'ptype\\'>${type}</span><div class=\\'img-fallback\\'>📦</div>'">` : `<div class="img-fallback">📦</div>`}
+                </div>
+                <div class="pbody">
+                    <h3>${pkg.name || "Untitled"}</h3>
+                    <p class="pdesc">${(pkg.description || "").replace(/<[^>]*>/g, "").substring(0, 100)}</p>
+                    <div class="pmeta">
+                        <span class="price">₹${minPrice.toLocaleString()} <small>starting</small></span>
+                        <span class="subs">👥 ${pkg._count?.packageCourseSubscription || 0} enrolled</span>
+                    </div>
+                </div>
+            </div>`;
+        }
+        function renderEbookCard(eb) {
+            const baseImgUrl = "https://www.gpsconline.com/uploads/e-books/thumbnail/";
+            const thumb = eb.thumbnail ? baseImgUrl + eb.thumbnail
+                : eb.image ? baseImgUrl + eb.image
+                    : "";
+            const plans = eb.plans || [];
+            const minPrice = plans.length ? Math.min(...plans.map((p) => p.price)) : 0;
+            const lang = eb.language || "";
+            const hasUrl = !!(eb.bookUrl && eb.salt);
+
+            return `<div class="package-card animate-in" onclick="openEbookDirect(${eb.id})">
+                <div class="pimg ebook-thumb-wrap">
+                    <span class="ptype">📘 ${lang}</span>
+                    ${thumb
+                    ? `<img src="${thumb}" referrerpolicy="no-referrer" crossorigin="anonymous"
+                            class="ebook-thumb-img"
+                            onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex'">
+                           <div class="img-fallback" style="display:none">📘</div>`
+                    : `<div class="img-fallback">📘</div>`
+                }
+                </div>
+                <div class="pbody">
+                    <h3>${eb.name || "Untitled"}</h3>
+                    <p class="pdesc">${(eb.description || "").replace(/<[^>]*>/g, "").replace(/\\n/g, " ").substring(0, 90)}</p>
+                    <div class="pmeta">
+                        <span class="price">₹${minPrice > 0 ? minPrice.toLocaleString() : "Free"} <small>${plans[0]?.name || ""}</small></span>
+                        <span class="subs" style="color:${hasUrl ? "var(--success)" : "var(--danger)"}">
+                            ${hasUrl ? "✅ Read" : "🔒 Locked"}
+                        </span>
+                    </div>
+                </div>
+            </div>`;
+        }
+        async function openEbookDirect(ebookId) {
+            // Dashboard cache mein check karo pehle
+            let eb = (STATE.ebookSectionData || []).find((e) => e.id === ebookId);
+
+            // Agar cache mein nahi mila toh API se fetch karo
+            if (!eb) {
+                toast("📘 Loading ebook...", "info");
+                try {
+                    const r = await fetch(`${EBOOK_URL}/${ebookId}`, {
+                        headers: {
+                            authorization: `bearer ${STATE.accessToken}`,
+                            deviceinfo: JSON.stringify(STATE.deviceInfo || {}),
+                            Accept: "application/json",
+                        },
+                    });
+                    const data = await r.json();
+                    eb = data.ebook || data;
+                } catch (e) {
+                    toast("❌ Failed to load: " + e.message, "error");
+                    return;
+                }
+            }
+
+            if (!eb) { toast("❌ Ebook not found", "error"); return; }
+
+            const salt = eb.salt;
+            const encUrl = eb.bookUrl;
+            const encDemo = eb.bookDemoUrl;
+            const thumb = eb.thumbnail
+                ? `https://www.gpsconline.com/uploads/e-books/thumbnail/${eb.thumbnail}`
+                : (eb.image ? `https://www.gpsconline.com/uploads/e-books/thumbnail/${eb.image}` : "");
+
+            // Try bookUrl first, fallback to bookDemoUrl
+            let pdfUrl = null;
+            if (encUrl && salt) {
+                pdfUrl = aesDecrypt(encUrl, salt);
+            }
+            if (!pdfUrl && encDemo && salt) {
+                pdfUrl = aesDecrypt(encDemo, salt);
+            }
+
+            showEbookModal(eb.name || "EBook", eb.author || "", eb.language || "", thumb, pdfUrl, eb);
+        }
+
+        function showEbookModal(title, author, lang, thumb, pdfUrl, ebData) {
+            // Remove old modal if any
+            const old = document.getElementById("ebook-modal");
+            if (old) old.remove();
+
+            const plans = ebData?.plans || [];
+            const minPrice = plans.length ? Math.min(...plans.map((p) => p.price)) : 0;
+            const planLabel = plans[0]?.name || "";
+
+            const modal = document.createElement("div");
+            modal.id = "ebook-modal";
+            modal.className = "modal-overlay show";
+            modal.style.cssText = "z-index:2000;";
+
+            modal.innerHTML = `
+            <div class="modal-content" style="max-width:820px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden">
+                <button class="modal-close" onclick="closeEbookModal()" style="z-index:10">✕</button>
+        
+                <!-- Header with book info -->
+                <div style="display:flex;gap:16px;padding:20px 20px 16px;border-bottom:1px solid var(--border);align-items:flex-start;flex-shrink:0">
+                    <div style="width:72px;height:90px;border-radius:var(--radius);overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#dbeafe,#ede9fe);display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:var(--shadow-md)">
+                        ${thumb ? `<img src="${thumb}" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='📘'">` : "📘"}
+                    </div>
+                    <div style="flex:1;min-width:0">
+                        <h3 style="font-size:17px;font-weight:800;margin-bottom:4px;line-height:1.3">${title}</h3>
+                        <p style="font-size:13px;color:var(--text-muted);margin-bottom:8px">✍️ ${author} ${lang ? `• 🌐 ${lang}` : ""}</p>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap">
+                            ${minPrice > 0 ? `<span style="font-size:12px;font-weight:700;background:var(--primary-light);color:var(--primary);padding:3px 10px;border-radius:20px">₹${minPrice} ${planLabel}</span>` : ""}
+                            <span style="font-size:12px;font-weight:700;background:${pdfUrl ? "var(--success-light)" : "var(--danger-light)"};color:${pdfUrl ? "var(--success)" : "var(--danger)"};padding:3px 10px;border-radius:20px">
+                                ${pdfUrl ? "✅ Decrypted" : "🔒 No URL"}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- PDF Viewer / Actions -->
+                <div style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+                    ${pdfUrl ? `
+                    <!-- Action buttons -->
+                    <div style="display:flex;gap:8px;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;flex-wrap:wrap">
+                        <button class="btn btn-sm btn-primary" onclick="openEbookInTab()">🌐 Open in Tab</button>
+                        <button class="btn btn-sm btn-success" onclick="downloadEbookPDF('${title.replace(/'/g, "\\'")}')">⬇️ Download PDF</button>
+                        <button class="btn btn-sm btn-outline" onclick="copyEbookUrl()">📋 Copy URL</button>
+                    </div>
+                    <!-- Iframe PDF viewer -->
+                    <div style="flex:1;overflow:hidden;position:relative;min-height:400px">
+                        <iframe id="ebook-iframe"
+                            src="${pdfUrl}#toolbar=1&navpanes=0"
+                            style="width:100%;height:100%;border:none;min-height:400px"
+                            loading="lazy"
+                            onerror="document.getElementById('ebook-iframe-fallback').style.display='flex'">
+                        </iframe>
+                        <!-- Fallback if iframe blocked -->
+                        <div id="ebook-iframe-fallback" style="display:none;position:absolute;inset:0;background:var(--bg);align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:32px;text-align:center">
+                            <div style="font-size:48px">📄</div>
+                            <h3 style="font-weight:700">PDF blocked in iframe</h3>
+                            <p style="color:var(--text-muted);font-size:14px">Browser ne direct embed rok diya. Neeche se open ya download karo.</p>
+                            <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+                                <button class="btn btn-primary" onclick="openEbookInTab()">🌐 Open in New Tab</button>
+                                <button class="btn btn-success" onclick="downloadEbookPDF('${title.replace(/'/g, "\\'")}')">⬇️ Download</button>
+                            </div>
+                        </div>
+                    </div>
+                    ` : `
+                    <!-- No URL state -->
+                    <div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:40px;text-align:center">
+                        <div style="font-size:64px">🔒</div>
+                        <h3 style="font-weight:700;font-size:18px">PDF URL mil nahi rahi</h3>
+                        <p style="color:var(--text-muted);font-size:14px;max-width:340px">Ye ebook decrypt nahi hui. Aapke account mein subscription nahi hai ya URL available nahi hai.</p>
+                    </div>
+                    `}
+                </div>
+            </div>`;
+
+            // Store current pdf url in modal for action buttons
+            modal.dataset.pdfUrl = pdfUrl || "";
+            modal.dataset.title = title;
+            document.body.appendChild(modal);
+
+            // Close on backdrop click
+            modal.addEventListener("click", (e) => { if (e.target === modal) closeEbookModal(); });
+
+            // Auto-detect iframe load failure after 3s
+            if (pdfUrl) {
+                setTimeout(() => {
+                    const iframe = document.getElementById("ebook-iframe");
+                    const fallback = document.getElementById("ebook-iframe-fallback");
+                    if (iframe && fallback) {
+                        try {
+                            // If iframe loaded but empty
+                            if (!iframe.contentDocument && !iframe.contentWindow) {
+                                fallback.style.display = "flex";
+                            }
+                        } catch (e) {
+                            // Cross-origin = loaded externally = probably fine
+                        }
+                    }
+                }, 3000);
+            }
+        }
+
+        function closeEbookModal() {
+            const m = document.getElementById("ebook-modal");
+            if (m) m.remove();
+        }
+        function openEbookInTab() {
+            const url = document.getElementById("ebook-modal")?.dataset?.pdfUrl;
+            if (url) window.open(url, "_blank");
+            else toast("No URL", "warning");
+        }
+        function copyEbookUrl() {
+            const url = document.getElementById("ebook-modal")?.dataset?.pdfUrl;
+            if (url) navigator.clipboard.writeText(url).then(() => toast("✅ URL Copied!", "success"));
+            else toast("No URL", "warning");
+        }
+        async function downloadEbookPDF(title) {
+            const url = document.getElementById("ebook-modal")?.dataset?.pdfUrl;
+            if (!url) { toast("No URL", "warning"); return; }
+            toast("⏳ Downloading...", "info");
+            try {
+                const r = await fetch(url);
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                const blob = await r.blob();
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = (title || "ebook") + ".pdf";
+                document.body.appendChild(a); a.click();
+                document.body.removeChild(a);
+                toast("✅ Downloaded!", "success");
+            } catch (e) {
+                toast("❌ " + e.message + " — Opening in tab", "error");
+                window.open(url, "_blank");
+            }
+        }
+        function showAllEbooks(isBack = false) {
+            if (!isBack) pushViewStack(() => showDashboard(true));
+            document.querySelectorAll(".app-nav-item").forEach((i) =>
+                i.classList.toggle("active", i.dataset.view === "ebooks")
+            );
+            STATE.currentView = "ebooks";
+            const container = document.getElementById("app-content");
+            const allEbooks = STATE.ebookSectionData || [];
+            if (!allEbooks.length) { toast("No ebooks found — open dashboard first", "warning"); return; }
+            let html = `
+            <div class="back-bar"><button onclick="goBackStack()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back</button><h2>📘 All EBooks (${allEbooks.length})</h2></div>
+            <div class="search-bar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><input placeholder="Search ebooks by name or author..." value="${STATE.lastEbookSearch || ''}" oninput="filterEbooks(this.value)"></div>
+            <div class="package-grid" id="ebook-grid-all">`;
+            allEbooks.forEach((eb) => (html += renderEbookCard(eb)));
+            html += `</div>`;
+            container.innerHTML = html;
+            if (STATE.lastEbookSearch) filterEbooks(STATE.lastEbookSearch);
+        }
+
+        function filterEbooks(q) {
+            STATE.lastEbookSearch = q || "";
+            document.getElementById("ebook-grid-all")?.querySelectorAll(".package-card").forEach((c) => {
+                const name = (c.querySelector("h3")?.textContent || "").toLowerCase();
+                const author = (c.querySelector(".subs")?.textContent || "").toLowerCase();
+                c.style.display = (!q || name.includes(q.toLowerCase()) || author.includes(q.toLowerCase())) ? "" : "none";
+            });
+        }
+
+        function showAllPackages(sIdx, isBack = false) {
+            if (!isBack) pushViewStack(() => showDashboard(true));
+            const section = STATE.dashboardData?.dashboard?.filter((s) => s.type === "package")[sIdx];
+            if (section?.data) renderAllPackagesView(section.data, section.title || "All Packages");
+            else fetchAllPackages(true);
+        }
+
+        function fetchAllPackages(isBack = false) {
+            if (!isBack) pushViewStack(() => showDashboard(true));
+            document.querySelectorAll(".app-nav-item").forEach((i) => i.classList.toggle("active", i.dataset.view === "packages"));
+            STATE.currentView = "packages";
+            const container = document.getElementById("app-content");
+            container.innerHTML = `<div class="empty-state"><div class="loader-ring" style="margin:0 auto 16px"></div><p style="color:var(--text-muted)">Loading packages...</p></div>`;
+            fetchAllPackagesSilent().then((d) => {
+                if (d?.packages) renderAllPackagesView(d.packages, "All Packages");
+                else container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📦</div><h3>No packages found</h3></div>`;
+            });
+        }
+
+        async function fetchAllPackagesSilent() {
+            try {
+                const r = await fetch(`${BASE2}/package/type/1`, {
+                    headers: { Authorization: `bearer ${STATE.accessToken}`, Accept: "application/json" },
+                });
+                const d = await r.json();
+                STATE.packagesData = d;
+                return d;
+            } catch (e) { return null; }
+        }
+
+        function renderAllPackagesView(pkgs, title) {
+            const c = document.getElementById("app-content");
+            const lastQ = STATE.lastPackageSearch || "";
+            let h = `<div class="back-bar"><button onclick="goBackStack()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back</button><h2>${title}</h2></div>
+            <div class="search-bar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><input placeholder="Search courses..." value="${lastQ}" oninput="filterPackages(this.value)"></div>
+            <div class="package-grid" id="package-grid">`;
+            pkgs.forEach((p) => (h += renderPackageCard(p)));
+            h += `</div>`;
+            c.innerHTML = h;
+            if (lastQ) filterPackages(lastQ);
+        }
+
+        function filterPackages(q) {
+            STATE.lastPackageSearch = q || "";
+            document.getElementById("package-grid")?.querySelectorAll(".package-card").forEach((c) => {
+                const t = (c.querySelector("h3")?.textContent || "").toLowerCase();
+                c.style.display = !q || t.includes(q.toLowerCase()) ? "" : "none";
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // ═══ openPackage + renderCourseView ═════════════
+        // ═══════════════════════════════════════════════════════════
+
+        function openPackage(packageId, isBack = false) {
+            if (!isBack) {
+                const pkgs = STATE.packagesData?.packages;
+                pushViewStack(() => {
+                    if (pkgs) renderAllPackagesView(pkgs, "All Packages");
+                    else fetchAllPackages(true);
+                });
+            }
+            STATE.currentPackageId = packageId;
+            STATE.examPackageId = packageId;
+            const container = document.getElementById("app-content");
+            container.innerHTML = `<div class="empty-state"><div class="loader-ring" style="margin:0 auto 16px"></div><p style="color:var(--text-muted)">Loading course...</p></div>`;
+            fetch(`${BASE2}/package/${packageId}`, {
+                headers: { Authorization: `bearer ${STATE.accessToken}`, Accept: "application/json" },
+            })
+                .then((r) => r.json())
+                .then((d) => {
+                    STATE.courseData = d;
+                    renderCourseView(d);
+                })
+                .catch((e) => {
+                    container.innerHTML = `<div class="empty-state"><p style="color:var(--danger)">Error: ${e.message}</p></div>`;
+                });
+        }
+
+        function renderCourseView(data) {
+            const subs = data.subjects || [];
+            const materials = data.materials || [];
+            const exams = data.exams || [];
+            let html = `<div class="back-bar"><button onclick="goBackStack()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back</button><h2>📚 Course Content</h2></div>`;
+
+            html += `<div style="display:flex;flex-direction:column;gap:16px;padding:8px 0">`;
+
+            // ─── SUBJECTS FOLDER ───
+            html += `<div class="card" style="cursor:pointer;padding:28px 24px;margin-bottom:0" onclick="showAllSubjects(${STATE.currentPackageId})">
+                <div style="display:flex;align-items:center;gap:16px">
+                    <div style="width:56px;height:56px;border-radius:var(--radius-lg);background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">📚</div>
+                    <div style="flex:1">
+                        <h3 style="font-size:18px;font-weight:700;margin-bottom:4px">Subjects</h3>
+                        <p style="font-size:13px;color:var(--text-muted);font-weight:500">${subs.length} subjects · Click to explore</p>
+                    </div>
+                    <span style="font-size:20px;color:var(--text-muted)">→</span>
+                </div>
+            </div>`;
+
+            // ─── MATERIALS FOLDER ───
+            if (materials.length) {
+                html += `<div class="card" style="cursor:pointer;padding:28px 24px;margin-bottom:0" onclick="showAllMaterials(${STATE.currentPackageId})">
+                    <div style="display:flex;align-items:center;gap:16px">
+                        <div style="width:56px;height:56px;border-radius:var(--radius-lg);background:#fef3c7;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">📄</div>
+                        <div style="flex:1">
+                            <h3 style="font-size:18px;font-weight:700;margin-bottom:4px">Study Materials</h3>
+                            <p style="font-size:13px;color:var(--text-muted);font-weight:500">${materials.length} materials · Click to open</p>
+                        </div>
+                        <span style="font-size:20px;color:var(--text-muted)">→</span>
+                    </div>
+                </div>`;
+            }
+
+            // ─── EXAMS FOLDER ───
+            if (exams.length) {
+                html += `<div class="card" style="cursor:pointer;padding:28px 24px;margin-bottom:0" onclick="showAllExams(${STATE.currentPackageId})">
+                    <div style="display:flex;align-items:center;gap:16px">
+                        <div style="width:56px;height:56px;border-radius:var(--radius-lg);background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">📝</div>
+                        <div style="flex:1">
+                            <h3 style="font-size:18px;font-weight:700;margin-bottom:4px">Tests / Exams</h3>
+                            <p style="font-size:13px;color:var(--text-muted);font-weight:500">${exams.length} exams · Click to take test</p>
+                        </div>
+                        <span style="font-size:20px;color:var(--text-muted)">→</span>
+                    </div>
+                </div>`;
+            }
+
+            // ─── DESCRIPTION ───
+            const desc = data.description || STATE.packagesData?.packages?.find((p) => p.id == STATE.currentPackageId)?.description;
+            if (desc) {
+                html += `<div class="card" style="padding:24px;margin-bottom:0">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><span style="font-size:20px">📖</span><h3 style="font-size:16px;font-weight:700">Description</h3></div>
+                    <div style="font-size:14px;color:var(--text-secondary);line-height:1.7">${desc}</div>
+                </div>`;
+            }
+
+            html += `</div>`;
+
+            if (!subs.length && !materials.length && !exams.length) {
+                html = `<div class="back-bar"><button onclick="goBackStack()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back</button><h2>📚 Course Content</h2></div>
+                <div class="empty-state"><div class="empty-state-icon">📭</div><h3>No content found</h3><p>This course doesn't have any content yet.</p></div>`;
+            }
+            document.getElementById("app-content").innerHTML = html;
+        }
+
+        function showAllSubjects(packageId, isBack = false) {
+            if (!isBack) pushViewStack(() => renderCourseView(STATE.courseData));
+            const container = document.getElementById("app-content");
+            const data = STATE.courseData;
+            const subs = data?.subjects || [];
+            if (!subs.length) { toast("No subjects", "warning"); return; }
+            let html = `<div class="back-bar"><button onclick="goBackStack()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back</button><h2>📚 Subjects</h2></div>
+            <div class="subject-grid" style="margin-top:16px">`;
+            subs.forEach((s) => {
+                const img = s.image ? `https://www.gpsconline.com/uploads/subject/${s.image}` : "";
+                html += `<div class="subject-card animate-in" onclick="openSubject(${s.id},'${(s.title || "").replace(/'/g, "\\'")}')">
+                    <div class="simg">${img ? `<img src="${img}" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.outerHTML='📁'" style="max-height:100%">` : '📁'}</div>
+                    <h4>${s.title}</h4><p>${s.havingChildDirectory ? "📂 Folders" : "📖 Lectures"}</p></div>`;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function showAllMaterials(packageId, isBack = false) {
+            if (!isBack) pushViewStack(() => renderCourseView(STATE.courseData));
+            const container = document.getElementById("app-content");
+            const data = STATE.courseData;
+            const materials = data?.materials || [];
+            if (!materials.length) { toast("No materials", "warning"); return; }
+            let html = `<div class="back-bar"><button onclick="goBackStack()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back</button><h2>📄 Study Materials</h2></div>
+            <div class="subject-grid" style="margin-top:16px">`;
+            materials.forEach((m) => {
+                const img = m.image ? `https://www.gpsconline.com/uploads/subject/${m.image}` : "";
+                html += `<div class="subject-card animate-in" onclick="openMaterial(${m.id},'${(m.name || "").replace(/'/g, "\\'")}')" style="border-color:var(--accent)">
+                    <div class="simg">${img ? `<img src="${img}" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.outerHTML='📄'" style="max-height:100%">` : '📄'}</div>
+                    <h4>${m.name}</h4><p>${m.havingChildDirectory ? "📂 Sub-folders" : "📄 PDF/Lectures"}</p></div>`;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function showAllExams(packageId) {
+            const container = document.getElementById("app-content");
+            const data = STATE.courseData;
+            const exams = data?.exams || [];
+            if (!exams.length) { toast("No exams", "warning"); return; }
+            let html = `<div class="back-bar"><button onclick="openPackage(${packageId})">←</button><h2>📝 Tests / Exams</h2></div>
+            <div class="subject-grid" style="margin-top:16px">`;
+            exams.forEach((ex) => {
+                const img = ex.image ? `https://www.gpsconline.com/uploads/exam/${ex.image}` : "";
+                html += `<div class="subject-card animate-in" onclick="openExamCategory(${ex.id})" style="border-color:var(--warning)">
+                    <div class="simg">${img ? `<img src="${img}" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.outerHTML='📝'" style="max-height:100%">` : '📝'}</div>
+                    <h4>${ex.name}</h4><p style="color:var(--warning)">Click to take test</p></div>`;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+        async function openMaterial(materialId, title) {
+            STATE.currentSubjectId = materialId;
+            const container = document.getElementById("app-content");
+            container.innerHTML = `<div class="empty-state"><div class="loader-ring" style="margin:0 auto 16px"></div><p style="color:var(--text-muted)">Loading material...</p></div>`;
+            try {
+                const r = await fetch(`${BASE}/subjects/${materialId}/materials`, {
+                    headers: { Authorization: `bearer ${STATE.accessToken}`, Accept: "application/json" },
+                });
+                const data = await r.json();
+                renderMaterialContent(data, title);
+            } catch (e) {
+                container.innerHTML = `<div class="empty-state"><p style="color:var(--danger)">Error: ${e.message}</p></div>`;
+            }
+        }
+
+        function renderMaterialContent(data, title) {
+            const subs = data.childDirectoryList || data.subjects || [];
+            const materials = data.materials || [];
+            const lectures = data.lectures || [];
+            let html = `<div class="back-bar"><button onclick="openPackage(${STATE.currentPackageId})">←</button><h2>${title}</h2></div>`;
+
+            if (subs.length) {
+                html += `<div class="section"><div class="section-header"><h2>📂 Sub-sections</h2></div><div class="subject-grid">`;
+                subs.forEach((s) => {
+                    html += `<div class="subject-card animate-in" onclick="openMaterial(${s.id},'${(s.title || s.name || "").replace(/'/g, "\'")}')">
+                        <div class="simg"><span style="font-size:32px">📂</span></div>
+                        <h4>${s.title || s.name || "Section"}</h4><p>Click to open</p></div>`;
+                });
+                html += `</div></div>`;
+            }
+
+            if (materials.length) {
+                html += `<div class="section"><div class="section-header"><h2>📄 PDF Files</h2></div><div class="lecture-list">`;
+                materials.forEach((m, i) => {
+                    const fileUrl = m.file || m.direct_link || "";
+                    const fileName = m.name || `File ${i + 1}`;
+                    html += `<div class="lecture-item animate-in" onclick="${fileUrl ? `window.open('${fileUrl.replace(/'/g, "\'")}', '_blank')` : "toast('No file URL')"}" style="cursor:pointer">
+                        <div class="lnum free" style="background:#dbeafe;color:#1d4ed8">📄</div>
+                        <div class="linfo"><div class="ltitle">${fileName}</div><div class="lmeta">${fileUrl ? "📎 Click to open/download" : "❌ No file"}</div></div>
+                        <span class="lbadge free" style="background:#dbeafe;color:#1d4ed8">PDF</span></div>`;
+                });
+                html += `</div></div>`;
+            }
+
+            if (lectures.length) {
+                html += `<div class="section"><div class="section-header"><h2>📖 Lectures</h2></div><div class="lecture-list">`;
+                lectures.forEach((l, i) => {
+                    const isFree = l.priceType === "free";
+                    html += `<div class="lecture-item animate-in" onclick="playLecture(${l.id},'${(l.title || "Lecture " + (i + 1)).replace(/'/g, "\'")}','${isFree ? "Free" : "Paid"}')">
+                        <div class="lnum ${isFree ? "free" : "paid"}">${i + 1}</div>
+                        <div class="linfo"><div class="ltitle">${l.title || "Lecture " + (i + 1)}</div><div class="lmeta">${l.topic || ""}</div></div>
+                        <span class="lbadge ${isFree ? "free" : "paid"}">${isFree ? "Free" : "Paid"}</span></div>`;
+                });
+                html += `</div></div>`;
+            }
+
+            if (!subs.length && !materials.length && !lectures.length) {
+                html += `<div class="empty-state"><div class="empty-state-icon">📭</div><h3>No content</h3><p>This material is empty.</p></div>`;
+            }
+            document.getElementById("app-content").innerHTML = html;
+        }
+
+        function openSubject(subjectId, title) {
+            STATE.currentSubjectId = subjectId;
+            STATE.currentSubjectTitle = title;
+            const container = document.getElementById("app-content");
+            container.innerHTML = `<div class="empty-state"><div class="loader-ring" style="margin:0 auto 16px"></div></div>`;
+            fetch(`${BASE}/subjects/${subjectId}/child`, {
+                headers: { Authorization: `bearer ${STATE.accessToken}`, Accept: "application/json" },
+            })
+                .then((r) => r.json())
+                .then((d) => {
+                    STATE.lecturesData = d;
+                    renderSubjectContent(d, title);
+                })
+                .catch((e) => {
+                    container.innerHTML = `<div class="empty-state"><p style="color:var(--danger)">Error: ${e.message}</p></div>`;
+                });
+        }
+
+        function openExamCategory(subjectId) {
+            document.querySelectorAll(".app-nav-item").forEach((i) => i.classList.toggle("active", i.dataset.view === "exams"));
+            STATE.currentView = "exams";
+            const c = document.getElementById("app-content");
+            c.innerHTML = `
+            <div class="back-bar"><button onclick="openPackage(${STATE.currentPackageId})">←</button><h2>Exams</h2></div>
+            <div class="card">
+                <div class="card-header"><h3>🔍 Subject Exams</h3></div>
+                <div class="input-group">
+                    <input type="number" id="examSubjectId" value="${subjectId}" min="1" class="flex-1">
+                    <button class="btn btn-primary" onclick="fetchExams()">📥 Load</button>
+                </div>
+                <div id="examStatus" class="status" style="display:none"></div>
+            </div>
+            <div id="examListContainer"><div class="empty-state"><div class="loader-ring" style="margin:0 auto 16px"></div></div></div>`;
+            fetchExams();
+        }
+
+        function renderSubjectContent(data, title) {
+            const dirs = data.childDirectoryList || [];
+            const lectures = data.lectures || [];
+            let html = `<div class="back-bar"><button onclick="openPackage(${STATE.currentPackageId})">←</button><h2>${title}</h2></div>`;
+            if (dirs.length) {
+                html += `<div class="section"><div class="section-header"><h2>📂 Folders</h2></div><div class="subject-grid">`;
+                dirs.forEach((d) => {
+                    const img = d.image ? `https://www.gpsconline.com/uploads/subject/${d.image}` : "";
+                    html += `<div class="subject-card animate-in" onclick="openFolder(${d.id},'${d.title.replace(/'/g, "\'")}')">
+                        <div class="simg">${img ? `<img src="${img}" referrerpolicy="no-referrer" crossorigin="anonymous">` : '<span style="font-size:32px">📂</span>'}</div>
+                        <h4>${d.title}</h4><p>${d.count || "Lectures"}</p>${d.isNewlyAdded ? '<span class="new-badge">New</span>' : ""}</div>`;
+                });
+                html += `</div></div>`;
+            }
+            if (lectures.length) {
+                html += `<div class="section"><div class="section-header"><h2>📖 Lectures</h2></div><div class="lecture-list">`;
+                lectures.forEach((l, i) => {
+                    const isFree = l.priceType === "free";
+                    html += `<div class="lecture-item animate-in" onclick="playLecture(${l.id},'${(l.title || "Lecture " + (i + 1)).replace(/'/g, "\'")}','${isFree ? "Free" : "Paid"}')">
+                        <div class="lnum ${isFree ? "free" : "paid"}">${i + 1}</div>
+                        <div class="linfo"><div class="ltitle">${l.title || "Lecture " + (i + 1)}</div><div class="lmeta">${l.topic || ""}</div></div>
+                        <span class="lbadge ${isFree ? "free" : "paid"}">${isFree ? "Free" : "Paid"}</span></div>`;
+                });
+                html += `</div></div>`;
+            }
+            if (!dirs.length && !lectures.length) {
+                html += `<div class="empty-state"><div class="empty-state-icon">📭</div><h3>No content found</h3></div>`;
+                setTimeout(() => fetchDirectLectures(title), 100);
+            }
+            document.getElementById("app-content").innerHTML = html;
+        }
+
+        function openFolder(folderId, title) {
+            const container = document.getElementById("app-content");
+            container.innerHTML = `<div class="empty-state"><div class="loader-ring" style="margin:0 auto 16px"></div></div>`;
+            fetch(`${BASE}/subjects/${folderId}/child`, {
+                headers: { Authorization: `bearer ${STATE.accessToken}`, Accept: "application/json" },
+            })
+                .then((r) => r.json())
+                .then((d) => {
+                    STATE.folderLectures = d;
+                    renderFolderContent(d, title);
+                })
+                .catch(() => {
+                    container.innerHTML = `<div class="empty-state"><p style="color:var(--danger)">Error loading folder</p></div>`;
+                });
+        }
+
+        function renderFolderContent(data, title) {
+            const dirs = data.childDirectoryList || [];
+            const lectures = data.lectures || [];
+            let html = `<div class="back-bar"><button onclick="openSubject(${STATE.currentSubjectId},'${STATE.currentSubjectTitle.replace(/'/g, "\'")}')">←</button><h2>${title}</h2></div>`;
+            if (dirs.length) {
+                html += `<div class="section"><div class="section-header"><h2>📂 Sub-folders</h2></div><div class="subject-grid">`;
+                dirs.forEach((d) => {
+                    html += `<div class="subject-card animate-in" onclick="openFolder(${d.id},'${d.title.replace(/'/g, "\'")}')"><div class="simg"><span style="font-size:32px">📂</span></div><h4>${d.title}</h4></div>`;
+                });
+                html += `</div></div>`;
+            }
+            if (lectures.length) {
+                html += `<div class="section"><div class="section-header"><h2>📖 Lectures</h2></div><div class="lecture-list">`;
+                lectures.forEach((l, i) => {
+                    const isFree = l.priceType === "free";
+                    html += `<div class="lecture-item animate-in" onclick="playLecture(${l.id},'${(l.title || "").replace(/'/g, "\'")}','${isFree ? "Free" : "Paid"}')">
+                        <div class="lnum ${isFree ? "free" : "paid"}">${i + 1}</div>
+                        <div class="linfo"><div class="ltitle">${l.title || "Lecture"}</div></div>
+                        <span class="lbadge ${isFree ? "free" : "paid"}">${isFree ? "Free" : "Paid"}</span></div>`;
+                });
+                html += `</div></div>`;
+            }
+            if (!dirs.length && !lectures.length)
+                html += `<div class="empty-state"><div class="empty-state-icon">📭</div><h3>No lectures found</h3></div>`;
+            document.getElementById("app-content").innerHTML = html;
+        }
+
+        function fetchDirectLectures(title) {
+            fetch(`${BASE}/lecture?course=${STATE.currentPackageId}&type=package&subjectId=${STATE.currentSubjectId}`, {
+                headers: { Authorization: `bearer ${STATE.accessToken}`, Accept: "application/json" },
+            })
+                .then((r) => r.json())
+                .then((data) => {
+                    const lectures = Array.isArray(data) ? data : data.lectures || data.data || [];
+                    if (lectures.length) {
+                        let html = `<div class="back-bar"><button onclick="openPackage(${STATE.currentPackageId})">←</button><h2>${title}</h2></div>
+                    <div class="section"><div class="section-header"><h2>📖 All Lectures</h2></div><div class="lecture-list">`;
+                        lectures.forEach((l, i) => {
+                            const isFree = l.priceType === "free";
+                            html += `<div class="lecture-item animate-in" onclick="playLecture(${l.id},'${(l.title || "").replace(/'/g, "\'")}','${isFree ? "Free" : "Paid"}')">
+                            <div class="lnum ${isFree ? "free" : "paid"}">${i + 1}</div>
+                            <div class="linfo"><div class="ltitle">${l.title || "Lecture"}</div></div>
+                            <span class="lbadge ${isFree ? "free" : "paid"}">${isFree ? "Free" : "Paid"}</span></div>`;
+                        });
+                        html += `</div></div>`;
+                        document.getElementById("app-content").innerHTML = html;
+                    }
+                })
+                .catch(() => { });
+        }
+
+        async function playLecture(lectureId, title, type) {
+            toast("Loading lecture...", "info");
+            try {
+                const r = await fetch(`${BASE}/lecture?id=${lectureId}&course=${STATE.currentPackageId}&type=package`, {
+                    headers: { Authorization: `bearer ${STATE.accessToken}`, Accept: "application/json" },
+                });
+                const d = await r.json();
+                showVideoModal(title, d.videoURL || d.token || "", type);
+            } catch (e) { toast("Error: " + e.message, "error"); }
+        }
+
+        function showVideoModal(title, token, type) {
+            let modal = document.getElementById("video-modal");
+            if (!modal) {
+                modal = document.createElement("div");
+                modal.id = "video-modal";
+                modal.className = "modal-overlay";
+                modal.innerHTML = `<div class="modal-content"><button class="modal-close" onclick="closeVideoModal()">✕</button>
+                    <div class="modal-video"><span class="play-icon" id="modal-play-btn" onclick="buildVideoUrl()">▶</span>
+                    <video id="modal-video-element" style="display:none" controls playsinline></video></div>
+                    <div class="modal-body"><h3 id="modal-video-title">Lecture</h3>
+                    <p id="modal-video-meta">Click play to stream</p></div></div>`;
+                document.body.appendChild(modal);
+            }
+            document.getElementById("modal-video-title").textContent = title;
+            document.getElementById("modal-video-meta").textContent = `Token: ${(token || "").substring(0, 40)}...`;
+            modal.dataset.token = token;
+            modal.classList.add("show");
+            const v = document.getElementById("modal-video-element");
+            v.style.display = "none"; v.pause(); v.removeAttribute("src");
+            document.getElementById("modal-play-btn").style.display = "block";
+        }
+
+        function buildVideoUrl() {
+            const token = document.getElementById("video-modal")?.dataset?.token || "";
+            if (!token) return;
+            const url = token.includes("cloudfront.net") || token.startsWith("http") ? token : `https://dx3rv97t4h9w0.cloudfront.net/file_library/videos/vod_non_drm_ios/${token}`;
+            const v = document.getElementById("modal-video-element");
+            v.src = url; v.style.display = "block";
+            document.getElementById("modal-play-btn").style.display = "none";
+            v.play().catch(() => { v.style.display = "none"; document.getElementById("modal-play-btn").style.display = "block"; });
+        }
+
+        function closeVideoModal() {
+            const m = document.getElementById("video-modal");
+            if (m) {
+                m.classList.remove("show");
+                const v = document.getElementById("modal-video-element");
+                if (v) { v.pause(); v.removeAttribute("src"); v.style.display = "none"; }
+                document.getElementById("modal-play-btn").style.display = "block";
+            }
+        }
+
+        document.addEventListener("click", (e) => {
+            const m = document.getElementById("video-modal");
+            if (m && m.classList.contains("show") && e.target === m) closeVideoModal();
+        });
+
+        function showProfile() {
+            document.querySelectorAll(".app-nav-item").forEach((i) => i.classList.toggle("active", i.dataset.view === "profile"));
+            STATE.currentView = "profile";
+            const u = STATE.user || {};
+            document.getElementById("app-content").innerHTML = `
+            <div class="profile-page">
+                <div class="profile-hero">
+                    <div class="profile-avatar">${(u.fullName || "U").charAt(0)}</div>
+                    <h3>${u.fullName || "User"}</h3>
+                    <p>@${u.phoneNumber || "user"}</p>
+                </div>
+                <div class="profile-info-grid">
+                    <div class="profile-info-row"><span class="label">📱 Phone</span><span class="value">+91 ${u.phoneNumber || "N/A"}</span></div>
+                    <div class="profile-info-row"><span class="label">📧 Email</span><span class="value">${u.emailAddress || "N/A"}</span></div>
+                    <div class="profile-info-row"><span class="label">🔑 Login Method</span><span class="value">${STATE.details ? "OTP Verification" : "Bearer Token"}</span></div>
+                    <div class="profile-info-row"><span class="label">🆔 User ID</span><span class="value">${u.id || "N/A"}</span></div>
+                </div>
+            </div>`;
+        }
+
+        // ═══ BOOK DECRYPTOR ════════════════════════════════════
+        function showBookDecryptor() {
+            document.querySelectorAll(".app-nav-item").forEach((i) => i.classList.toggle("active", i.dataset.view === "decryptor"));
+            STATE.currentView = "decryptor";
+            renderBookDecryptor();
+        }
+
+        function renderBookDecryptor() {
+            const c = document.getElementById("app-content");
+            c.innerHTML = `
+            <div style="margin-bottom:24px">
+                <h1 style="font-size:24px;font-weight:800;background:var(--primary-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">📘 Book Fetcher + Decryptor</h1>
+                <p style="color:var(--text-muted);font-size:14px;margin-top:6px">Fetch ebooks, decrypt AES/CBC/PKCS7 (OpenSSL salted) URLs, download PDFs</p>
+            </div>
+            <div class="tool-container">
+                <div>
+                    <div class="card">
+                        <div class="card-header"><h3>🔍 Book Lookup</h3><span class="badge">GET /v2/ebooks/{id}</span></div>
+                        <div class="input-group">
+                            <input type="number" id="bookId" value="79" min="1" class="flex-1" placeholder="Book ID">
+                            <button class="btn btn-primary" onclick="fetchBook()">🚀 Fetch</button>
+                        </div>
+                        <div id="statusMsg" class="status" style="display:none"></div>
+                    </div>
+                    <div class="card" id="bookInfoCard" style="display:none">
+                        <div class="card-header"><h3>📋 Book Summary</h3><span class="badge" id="langBadge">-</span></div>
+                        <div class="book-info" id="bookInfoGrid"></div>
+                        <div class="action-bar" style="margin-top:16px">
+                            <button class="btn btn-sm btn-outline" onclick="decryptBookUrl()">🔓 Decrypt bookUrl</button>
+                            <button class="btn btn-sm btn-outline" onclick="decryptDemoUrl()">🔓 Decrypt bookDemoUrl</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h3>📄 Response</h3>
+                            <div style="display:flex;gap:6px">
+                                <button class="btn btn-sm btn-outline" onclick="copyResponse()">📋 Copy</button>
+                                <button class="btn btn-sm btn-danger" onclick="clearBookData()">🗑️ Clear</button>
+                            </div>
+                        </div>
+                        <div id="responseBox" class="response-box">Click "Fetch" to see raw response</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="card">
+                        <div class="card-header"><h3>🔓 Decryptor</h3><span class="badge">AES/CBC/PKCS7</span></div>
+                        <div class="form-group">
+                            <label>Encrypted Data</label>
+                            <textarea id="manualEncrypted" placeholder="Paste U2FsdGVkX1... (OpenSSL Base64)"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Passphrase / Salt</label>
+                            <input type="text" id="manualSalt" placeholder="Book salt as passphrase">
+                        </div>
+                        <button class="btn btn-warning" onclick="manualDecrypt()" style="width:100%">🔓 Decrypt Now</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h3>📤 Decrypted Output</h3></div>
+                        <div id="decryptBox" class="decrypt-output"><span style="color:var(--text-muted)">No data yet</span></div>
+                        <div class="action-bar" id="decryptActions" style="display:none;margin-top:14px">
+                            <button class="btn btn-sm btn-outline" onclick="copyDecrypted()">📋 Copy</button>
+                            <button class="btn btn-sm btn-success" onclick="openDecrypted()">🌐 Open</button>
+                            <button class="btn btn-sm btn-success" onclick="downloadPDF()">⬇️ Download PDF</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+            if (STATE.lastBookData) {
+                updateBookInfoCard(STATE.lastBookData);
+                document.getElementById("responseBox").innerHTML = highlightJSON(STATE.lastBookData);
+                if (STATE.lastBookData.ebook?.salt) document.getElementById("manualSalt").value = STATE.lastBookData.ebook.salt;
+            }
+        }
+
+        function highlightJSON(obj) {
+            return JSON.stringify(obj, null, 2)
+                .replace(/("(?:\.|[^"\\])*")\s*:/g, '<span class="key">$1</span>:')
+                .replace(/: ("(?:\.|[^"\\])*")/g, ': <span class="string">$1</span>')
+                .replace(/: (-?\d+\.?\d*)/g, ': <span class="number">$1</span>')
+                .replace(/: (true|false)/g, ': <span class="boolean">$1</span>')
+                .replace(/: (null)/g, ': <span class="null">$1</span>')
+                .replace(/([\[\]{}])/g, '<span class="bracket">$1</span>');
+        }
+
+        function updateBookInfoCard(data) {
+            if (!data?.ebook) return;
+            const e = data.ebook;
+            document.getElementById("bookInfoCard").style.display = "block";
+            document.getElementById("langBadge").textContent = e.language || "-";
+            const plans = e.plans?.length ? e.plans.map((p) => `${p.name} (₹${p.price})`).join(" | ") : "No plans";
+            document.getElementById("bookInfoGrid").innerHTML = `
+                <div class="info-item"><div class="label">ID</div>${e.id}</div>
+                <div class="info-item"><div class="label">Name</div>${e.name || "-"}</div>
+                <div class="info-item"><div class="label">Author</div>${e.author || "-"}</div>
+                <div class="info-item"><div class="label">Salt</div><code>${e.salt || "N/A"}</code></div>
+                <div class="info-item"><div class="label">Has URL</div>${e.bookUrl ? "✅ Yes" : "❌ No"}</div>
+                <div class="info-item"><div class="label">Price</div>${plans}</div>`;
+        }
+
+        async function fetchBook() {
+            const id = document.getElementById("bookId").value.trim();
+            if (!id) { toast("Enter Book ID", "warning"); return; }
+            setBookStatus("loading", "⏳ Fetching book...");
+            try {
+                const r = await fetch(`${EBOOK_URL}/${id}`, {
+                    headers: {
+                        authorization: `bearer ${STATE.accessToken}`,
+                        deviceinfo: JSON.stringify(STATE.deviceInfo),
+                        Accept: "application/json",
+                    },
+                });
+                const data = await r.json();
+                STATE.lastBookData = data;
+                document.getElementById("responseBox").innerHTML = highlightJSON(data);
+                if (r.ok) {
+                    updateBookInfoCard(data);
+                    setBookStatus("success", `✅ Fetched! Salt: ${data.ebook?.salt || "N/A"}`);
+                    if (data.ebook?.salt) document.getElementById("manualSalt").value = data.ebook.salt;
+                } else setBookStatus("error", `❌ HTTP ${r.status}: ${data.message || "Error"}`);
+            } catch (e) { setBookStatus("error", "❌ " + e.message); }
+        }
+
+        function setBookStatus(type, msg) {
+            const el = document.getElementById("statusMsg");
+            if (!el) return;
+            el.className = "status " + type;
+            el.textContent = msg;
+            el.style.display = "block";
+            setTimeout(() => (el.style.display = "none"), 5000);
+        }
+        function decryptBookUrl() { decryptField("bookUrl"); }
+        function decryptDemoUrl() { decryptField("bookDemoUrl"); }
+        function decryptField(field) {
+            if (!STATE.lastBookData?.ebook) { toast("Fetch book first", "warning"); return; }
+            const enc = STATE.lastBookData.ebook[field];
+            const salt = STATE.lastBookData.ebook.salt;
+            if (!enc) { toast(`No ${field} field`, "warning"); return; }
+            if (!salt) { toast("No salt in book", "warning"); return; }
+            document.getElementById("manualEncrypted").value = enc;
+            document.getElementById("manualSalt").value = salt;
+            manualDecrypt();
+        }
+
+        function manualDecrypt() {
+            const enc = document.getElementById("manualEncrypted").value.trim();
+            const pass = document.getElementById("manualSalt").value.trim();
+            if (!enc || !pass) { toast("Fill both fields", "warning"); return; }
+            const result = aesDecrypt(enc, pass);
+            const box = document.getElementById("decryptBox");
+            const actions = document.getElementById("decryptActions");
+            if (!result) {
+                box.innerHTML = `<div style="color:var(--danger);font-weight:700;margin-bottom:6px">❌ Decryption failed</div><div style="color:var(--text-muted);font-size:12px">Wrong passphrase or not OpenSSL format</div>`;
+                actions.style.display = "none";
+                STATE.decryptedUrl = null;
+                return;
+            }
+            STATE.decryptedUrl = result;
+            const isUrl = result.startsWith("http");
+            box.innerHTML = `<div style="color:var(--success);font-weight:700;margin-bottom:10px">✅ Decrypted!</div>
+                ${isUrl ? `<div class="decrypted-url"><a href="${result}" target="_blank">${result}</a></div>` : `<div class="decrypted-url">${result}</div>`}`;
+            actions.style.display = "flex";
+            actions.querySelectorAll(".btn-success").forEach((b) => (b.style.display = isUrl ? "" : "none"));
+        }
+
+        function aesDecrypt(enc, pass) {
+            try {
+                const b = CryptoJS.AES.decrypt(enc, pass);
+                return b.toString(CryptoJS.enc.Utf8) || null;
+            } catch (e) { return null; }
+        }
+        function copyDecrypted() {
+            if (STATE.decryptedUrl) navigator.clipboard.writeText(STATE.decryptedUrl).then(() => toast("✅ Copied!", "success"));
+            else toast("No decrypted URL", "warning");
+        }
+        function openDecrypted() {
+            if (STATE.decryptedUrl) window.open(STATE.decryptedUrl, "_blank");
+            else toast("No URL", "warning");
+        }
+        async function downloadPDF() {
+            if (!STATE.decryptedUrl) { toast("No URL", "warning"); return; }
+            setBookStatus("loading", "⏳ Downloading...");
+            try {
+                const r = await fetch(STATE.decryptedUrl);
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                const blob = await r.blob();
+                const name = (STATE.lastBookData?.ebook?.name || "book") + ".pdf";
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url; a.download = name;
+                document.body.appendChild(a); a.click();
+                document.body.removeChild(a); URL.revokeObjectURL(url);
+                setBookStatus("success", "✅ Downloaded: " + name);
+            } catch (e) {
+                setBookStatus("error", "❌ " + e.message);
+                window.open(STATE.decryptedUrl, "_blank");
+            }
+        }
+        function copyResponse() {
+            if (STATE.lastBookData)
+                navigator.clipboard.writeText(JSON.stringify(STATE.lastBookData, null, 2)).then(() => toast("✅ Copied!", "success"));
+        }
+        function clearBookData() {
+            STATE.lastBookData = null; STATE.decryptedUrl = null;
+            document.getElementById("responseBox").innerHTML = `Click "Fetch" to see raw response`;
+            document.getElementById("bookInfoCard").style.display = "none";
+            document.getElementById("decryptBox").innerHTML = '<span style="color:var(--text-muted)">No data yet</span>';
+            document.getElementById("decryptActions").style.display = "none";
+            toast("Cleared", "info");
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // ═══ EXAM / TEST FEATURE ═════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════════════════
+
+        function showExams() {
+            document.querySelectorAll(".app-nav-item").forEach((i) => i.classList.toggle("active", i.dataset.view === "exams"));
+            STATE.currentView = "exams";
+            renderExamBrowser();
+        }
+
+        function renderExamBrowser(selectedSubjectId) {
+            const c = document.getElementById("app-content");
+            c.innerHTML = `
+            <div style="margin-bottom:24px">
+                <h1 style="font-size:24px;font-weight:800;background:var(--primary-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">📝 Exams / Tests</h1>
+                <p style="color:var(--text-muted);font-size:14px;margin-top:6px">Browse and take exams by subject</p>
+            </div>
+            <div class="card">
+                <div class="card-header"><h3>🔍 Subject Search</h3></div>
+                <div class="input-group">
+                    <input type="number" id="examSubjectId" value="2008" min="1" class="flex-1" placeholder="Subject ID (e.g. 2008)">
+                    <button class="btn btn-primary" onclick="fetchExams()">📥 Load Exams</button>
+                </div>
+                <div id="examStatus" class="status" style="display:none"></div>
+            </div>
+            <div id="examListContainer">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📝</div>
+                    <h3>Ready to test your knowledge?</h3>
+                    <p>Enter a Subject ID above and click "Load Exams" to see available tests.</p>
+                    <p style="font-size:12px;margin-top:8px;color:var(--text-muted)">Subject ID examples: 2008, 1620, 1720</p>
+                </div>
+            </div>`;
+            if (selectedSubjectId) {
+                document.getElementById("examSubjectId").value = selectedSubjectId;
+                fetchExams();
+            }
+        }
+
+        async function fetchExams() {
+            const subjectId = document.getElementById("examSubjectId").value.trim();
+            if (!subjectId) { toast("Enter Subject ID", "warning"); return; }
+            setExamStatus("loading", "⏳ Loading exams...");
+            try {
+                const r = await fetch(`${BASE}/subject/${subjectId}/exams`, {
+                    headers: { Authorization: `bearer ${STATE.accessToken}`, Accept: "application/json" },
+                });
+                const data = await r.json();
+                STATE.examSubjectId = subjectId;
+                if (data.exams && data.exams.length) {
+                    renderExamList(data.exams);
+                    setExamStatus("success", `✅ ${data.exams.length} exams found`);
+                } else {
+                    document.getElementById("examListContainer").innerHTML = `
+                        <div class="empty-state"><div class="empty-state-icon">📭</div><h3>No exams found</h3><p>Try a different Subject ID.</p></div>`;
+                    setExamStatus("error", "❌ No exams found");
+                }
+            } catch (e) { setExamStatus("error", "❌ " + e.message); }
+        }
+
+        function setExamStatus(type, msg) {
+            const el = document.getElementById("examStatus");
+            if (!el) return;
+            el.className = "status " + type;
+            el.textContent = msg;
+            el.style.display = "block";
+            setTimeout(() => (el.style.display = "none"), 5000);
+        }
+
+        function renderExamList(exams) {
+            const container = document.getElementById("examListContainer");
+            const activeExams = exams.filter((e) => e.status === true);
+            let html = `<div class="section"><div class="section-header"><h2>✅ Active Exams (${activeExams.length})</h2></div>
+            <div class="exam-grid">`;
+            activeExams.forEach((ex) => {
+                const isPaid = ex.isPaid;
+                const hasResult = ex.examResult && ex.examResult.length > 0;
+                const result = hasResult ? ex.examResult[0] : null;
+                const total = ex.numberOfQuestions || 0;
+                const progress = total > 0 ? Math.round(((result?.attempt || 0) / total) * 100) : 0;
+                html += `<div class="exam-card animate-in" onclick="startExam(${ex.id}, '${ex.name.replace(/'/g, "\'")}', ${total}, ${ex.time || total}, ${ex.positiveMarks || 1}, ${ex.negativeMarks || 0})">
+                    <h4>${ex.name}</h4>
+                    <div class="exam-meta">
+                        <span class="exam-tag ${isPaid ? "paid" : "free"}">${isPaid ? "💰 Paid" : "🆓 Free"}</span>
+                        <span class="exam-tag active">🟢 Active</span>
+                    </div>
+                    <div class="exam-detail">
+                        <span>📝 ${ex.numberOfQuestions} Q</span>
+                        <span>⏱ ${ex.time} min</span>
+                        <span>✅ +${ex.positiveMarks}</span>
+                        <span>❌ ${ex.negativeMarks}</span>
+                    </div>
+                    ${hasResult ? `<div class="exam-progress"><div class="exam-progress-bar"><div class="exam-progress-fill" style="width:${Math.min(progress, 100)}%"></div></div><div class="exam-progress-text">Attempted ${result.attempt || 0}/${total} • Score: ${result.score || 0}</div></div>` : `<div style="margin-top:12px;font-size:13px;color:var(--primary);font-weight:600">Click to start →</div>`}
+                </div>`;
+            });
+            html += `</div></div>`;
+            const inactive = exams.filter((e) => e.status !== true);
+            if (inactive.length) {
+                html += `<div class="section"><div class="section-header"><h2>⏸️ Inactive Exams (${inactive.length})</h2></div>
+                <div class="exam-grid">`;
+                inactive.forEach((ex) => {
+                    html += `<div class="exam-card" style="opacity:0.6;cursor:default">
+                        <h4>${ex.name}</h4>
+                        <div class="exam-meta"><span class="exam-tag inactive">⏸️ Inactive</span></div>
+                        <div class="exam-detail"><span>📝 ${ex.numberOfQuestions} Q</span><span>⏱ ${ex.time} min</span></div>
+                    </div>`;
+                });
+                html += `</div></div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        async function startExam(examId, examName, totalQuestions, examTime, positiveMarks, negativeMarks) {
+            STATE.currentExamId = examId;
+            STATE.examAnswers = {};
+            STATE.examStartTime = Date.now();
+            STATE.examResult = null;
+            const container = document.getElementById("app-content");
+            container.innerHTML = `<div class="empty-state"><div class="loader-ring" style="margin:0 auto 16px"></div><p style="color:var(--text-muted)">Loading exam questions...</p></div>`;
+            try {
+                const r = await fetch(`${BASE}/exams/${examId}`, {
+                    headers: { Authorization: `bearer ${STATE.accessToken}`, Accept: "application/json" },
+                });
+                const data = await r.json();
+                STATE.currentExamData = {
+                    name: examName, total: totalQuestions,
+                    examTime: examTime || totalQuestions,
+                    positiveMarks: positiveMarks || 1,
+                    negativeMarks: negativeMarks || 0,
+                };
+                STATE.currentExamQuestions = data;
+                renderExamInterface();
+            } catch (e) {
+                container.innerHTML = `<div class="empty-state"><p style="color:var(--danger)">Error: ${e.message}</p></div>`;
+            }
+        }
+
+        let currentQuestionIndex = 0;
+
+        function renderExamInterface() {
+            const questions = STATE.currentExamQuestions;
+            if (!questions || !questions.length) {
+                document.getElementById("app-content").innerHTML = `<div class="empty-state"><h3>No questions found</h3></div>`;
+                return;
+            }
+            currentQuestionIndex = 0;
+            const examTime = STATE.currentExamData?.examTime || questions.length;
+            const totalTime = examTime * 60;
+            const container = document.getElementById("app-content");
+            container.innerHTML = `
+            <div class="back-bar"><button onclick="exitExam()">←</button><h2>${STATE.currentExamData?.name || "Exam"}</h2></div>
+            <div class="question-header">
+                <div class="q-progress" id="qProgress">Question 1 of ${questions.length}</div>
+                <div style="display:flex;align-items:center;gap:12px">
+                    <span style="font-size:12px;font-weight:700;background:var(--primary-light);color:var(--primary);padding:4px 12px;border-radius:20px">📝 ${questions.length} Q</span>
+                    <div class="q-timer" id="qTimer">${formatTime(totalTime)}</div>
+                </div>
+            </div>
+            <div id="questionArea"></div>
+            <div class="question-actions" style="margin-top:20px">
+                <button class="btn btn-outline" onclick="prevQuestion()">← Previous</button>
+                <button class="btn btn-outline" onclick="nextQuestion()">Next →</button>
+            </div>
+            <div style="margin-top:20px"><button class="btn btn-submit" onclick="submitExam()">📤 Submit Exam</button></div>`;
+            renderQuestion(0);
+            startExamTimer(totalTime);
+        }
+
+        function renderQuestion(index) {
+            const questions = STATE.currentExamQuestions;
+            if (!questions || index < 0 || index >= questions.length) return;
+            currentQuestionIndex = index;
+            const q = questions[index];
+            const area = document.getElementById("questionArea");
+            const answers = q.answers || [];
+            const selectedId = STATE.examAnswers[q.id] || null;
+            const isSkipped = selectedId === "skip";
+
+            let optionsHtml = "";
+            answers.forEach((a) => {
+                if (a.name === "Skip" || a.name === "skip") return;
+                const isSelected = selectedId === a.id;
+                optionsHtml += `
+                    <div class="option-item ${isSelected ? "selected" : ""}" onclick="selectOption(${q.id}, ${a.id})">
+                        <div class="option-radio"></div>
+                        <div class="option-text">${a.name}</div>
+                    </div>`;
+            });
+            optionsHtml += `
+                <div class="option-item ${isSkipped ? "selected" : ""}" onclick="selectOption(${q.id}, 'skip')" style="opacity:0.7">
+                    <div class="option-radio"></div>
+                    <div class="option-text"><span class="skip-label">⏭️ Skip this question</span></div>
+                </div>`;
+
+            area.innerHTML = `
+                <div class="question-card">
+                    <div class="q-number">${index + 1}</div>
+                    <div class="q-text">${q.name || "Question"}</div>
+                    ${q.image ? `<div style="margin-bottom:14px"><img src="${q.image}" style="max-width:100%;border-radius:var(--radius)" alt="question image"></div>` : ""}
+                    <div class="options-grid">${optionsHtml}</div>
+                </div>`;
+
+            document.getElementById("qProgress").textContent = `Question ${index + 1} of ${questions.length}`;
+        }
+
+        function selectOption(questionId, answerId) {
+            STATE.examAnswers[questionId] = answerId;
+            renderQuestion(currentQuestionIndex);
+        }
+
+        function nextQuestion() {
+            const questions = STATE.currentExamQuestions;
+            if (currentQuestionIndex < questions.length - 1) renderQuestion(currentQuestionIndex + 1);
+        }
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) renderQuestion(currentQuestionIndex - 1);
+        }
+
+        let examTimerInterval = null;
+        function startExamTimer(seconds) {
+            if (examTimerInterval) clearInterval(examTimerInterval);
+            const timerEl = document.getElementById("qTimer");
+            if (!timerEl) return;
+            let remaining = seconds;
+            examTimerInterval = setInterval(() => {
+                remaining--;
+                if (remaining <= 0) {
+                    clearInterval(examTimerInterval);
+                    toast("⏰ Time is up! Auto-submitting...", "warning");
+                    submitExam();
+                    return;
+                }
+                if (timerEl) {
+                    timerEl.textContent = formatTime(remaining);
+                    timerEl.classList.toggle("warning", remaining < 60);
+                }
+            }, 1000);
+        }
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60);
+            const s = sec % 60;
+            return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+        }
+        function exitExam() {
+            if (examTimerInterval) clearInterval(examTimerInterval);
+            if (Object.keys(STATE.examAnswers).length > 0) {
+                if (!confirm("Exit exam? Your answers will be lost.")) return;
+            }
+            STATE.currentExamId = null; STATE.currentExamQuestions = null;
+            STATE.examAnswers = {}; STATE.examResult = null;
+            if (STATE.currentPackageId) openPackage(STATE.currentPackageId);
+            else showExams();
+        }
+
+        function submitExam() {
+            const questions = STATE.currentExamQuestions;
+            if (!questions || !questions.length) return;
+            let answered = 0, skipped = 0;
+            questions.forEach((q) => {
+                const ans = STATE.examAnswers[q.id];
+                if (!ans || ans === "skip") skipped++;
+                else answered++;
+            });
+            if (answered === 0) {
+                if (!confirm("You haven't answered any questions. Submit anyway?")) return;
+            } else {
+                if (!confirm(`Submit exam?
+Answered: ${answered}
+Skipped: ${skipped}
+Total: ${questions.length}`)) return;
+            }
+            if (examTimerInterval) clearInterval(examTimerInterval);
+            const posMarks = STATE.currentExamData?.positiveMarks || 1;
+            const negMarks = STATE.currentExamData?.negativeMarks || 0;
+            let correct = 0, wrong = 0, skip = 0;
+            questions.forEach((q) => {
+                const selectedAns = STATE.examAnswers[q.id];
+                if (!selectedAns || selectedAns === "skip") { skip++; }
+                else {
+                    const correctObj = (q.answers || []).find((a) => a.answer === true);
+                    if (correctObj && selectedAns === correctObj.id) correct++;
+                    else wrong++;
+                }
+            });
+            const score = correct * posMarks - wrong * negMarks;
+            const attempt = correct + wrong;
+            const timeTaken = Math.round((Date.now() - STATE.examStartTime) / 1000);
+            const accuracy = attempt > 0 ? ((correct / attempt) * 100).toFixed(1) : "0.0";
+            const mins = Math.floor(timeTaken / 60);
+            const secs = timeTaken % 60;
+            const localResult = {
+                score: score, total: questions.length, attempt: attempt,
+                success: correct, failed: wrong, skip: skip,
+                accuracy: accuracy, timing: `${mins}m ${secs}s`, rank: "N/A",
+            };
+            STATE.examResult = { examResult: localResult };
+            renderExamResult({ examResult: localResult });
+        }
+
+        function renderExamResult(data) {
+            const result = data.examResult || data;
+            const container = document.getElementById("app-content");
+            const accuracy = result.accuracy !== undefined ? parseFloat(result.accuracy).toFixed(1) : "N/A";
+            container.innerHTML = `
+            <div class="back-bar"><button onclick="exitExam()">←</button><h2>📊 Exam Result</h2></div>
+            <div class="result-card">
+                <div style="margin-bottom:20px">
+                    <div style="font-size:14px;color:var(--text-muted);margin-bottom:6px">Your Score</div>
+                    <div class="result-score">${result.score || 0}</div>
+                </div>
+                <div class="result-detail">
+                    <div class="result-item"><div class="rlabel">Total Questions</div><div class="rvalue">${result.total || 0}</div></div>
+                    <div class="result-item"><div class="rlabel">Attempted</div><div class="rvalue">${result.attempt || 0}</div></div>
+                    <div class="result-item"><div class="rlabel">Correct</div><div class="rvalue green">${result.success || 0}</div></div>
+                    <div class="result-item"><div class="rlabel">Wrong</div><div class="rvalue red">${result.failed || 0}</div></div>
+                    <div class="result-item"><div class="rlabel">Skipped</div><div class="rvalue orange">${result.skip || 0}</div></div>
+                    <div class="result-item"><div class="rlabel">Accuracy</div><div class="rvalue green">${accuracy}%</div></div>
+                    <div class="result-item"><div class="rlabel">Time Taken</div><div class="rvalue" style="font-size:14px">${result.timing || "N/A"}</div></div>
+                    <div class="result-item"><div class="rlabel">Rank</div><div class="rvalue" style="font-size:14px;color:var(--primary)">${result.rank || "N/A"}</div></div>
+                </div>
+                <div style="margin-top:24px;display:flex;gap:12px">
+                    <button class="btn btn-primary" style="flex:1" onclick="exitExam()">📝 Back</button>
+                    <button class="btn btn-outline" style="flex:1" onclick="reviewExamAnswers()">🔍 Review</button>
+                </div>
+            </div>`;
+        }
+
+        function reviewExamAnswers() {
+            const questions = STATE.currentExamQuestions;
+            if (!questions || !questions.length) { toast("No questions data available", "warning"); return; }
+            const container = document.getElementById("app-content");
+            let html = `<div class="back-bar"><button onclick="renderExamResult(STATE.examResult)">←</button><h2>🔍 Answer Review</h2></div>`;
+            questions.forEach((q, i) => {
+                const selectedAns = STATE.examAnswers[q.id];
+                const answers = q.answers || [];
+                const correctAnswerObj = answers.find((a) => a.answer === true);
+                const correctId = correctAnswerObj ? correctAnswerObj.id : null;
+                const isCorrect = selectedAns === correctId;
+                const isSkipped = !selectedAns || selectedAns === "skip";
+                let statusIcon = "⏭️";
+                if (selectedAns && selectedAns !== "skip") statusIcon = isCorrect ? "✅" : "❌";
+                html += `
+                    <div class="question-card" style="border-left:4px solid ${isSkipped ? "var(--warning)" : isCorrect ? "var(--success)" : "var(--danger)"};margin-bottom:14px">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                            <div class="q-number" style="margin-bottom:0">${i + 1}</div>
+                            <span style="font-size:20px">${statusIcon}</span>
+                        </div>
+                        <div class="q-text" style="font-size:15px">${q.name || "Question"}</div>
+                        ${q.image ? `<div style="margin-bottom:12px"><img src="${q.image}" style="max-width:100%;border-radius:var(--radius);max-height:200px" alt="question image"></div>` : ""}
+                        <div class="options-grid" style="gap:6px">`;
+                answers.forEach((a) => {
+                    if (a.name === "Skip" || a.name === "skip") return;
+                    const isSelected = selectedAns === a.id;
+                    const isRightAnswer = a.answer === true;
+                    let cls = "";
+                    if (isRightAnswer) cls = "correct";
+                    else if (isSelected && !isRightAnswer) cls = "wrong";
+                    html += `<div class="option-item ${cls}" style="cursor:default;padding:12px 14px">
+                        <div class="option-radio">${isRightAnswer ? "✓" : ""}</div>
+                        <div class="option-text" style="font-size:13px">${a.name} ${isRightAnswer ? '<span style="color:var(--success);font-weight:700;margin-left:8px">(Correct)</span>' : ""}</div>
+                    </div>`;
+                });
+                if (isSkipped) html += `<div style="margin-top:8px;padding:8px 12px;background:var(--warning-light);border-radius:var(--radius);font-size:13px;color:var(--warning);font-weight:500">⏭️ You skipped this question</div>`;
+                if (!isCorrect && selectedAns && selectedAns !== "skip") {
+                    html += `<div style="margin-top:8px;padding:8px 12px;background:var(--success-light);border-radius:var(--radius);font-size:13px;color:var(--success);font-weight:500">✅ Correct answer: ${q.answer || "See above"}</div>`;
+                    if (q.solutionDescription && q.solutionDescription !== ".") {
+                        html += `<div style="margin-top:6px;padding:8px 12px;background:var(--primary-light);border-radius:var(--radius);font-size:13px;color:var(--primary);font-weight:500">💡 ${q.solutionDescription}</div>`;
+                    }
+                }
+                html += `</div></div>`;
+            });
+            html += `<div style="margin-top:20px;text-align:center;padding-bottom:40px"><button class="btn btn-primary" onclick="renderExamResult(STATE.examResult)">📊 Back to Result</button></div>`;
+            container.innerHTML = html;
+        }
+
+        // ═══ INIT ═══════════════════════════════════════════════
+        document.addEventListener("DOMContentLoaded", () => {
+            const token = localStorage.getItem("ws_token");
+            if (token) {
+                STATE.accessToken = token;
+                try {
+                    const u = localStorage.getItem("ws_user");
+                    if (u) STATE.user = JSON.parse(u);
+                    const d = localStorage.getItem("ws_device");
+                    if (d) STATE.deviceInfo = JSON.parse(d);
+                } catch (e) { }
+                if (STATE.user) {
+                    document.getElementById("auth-screen").style.display = "none";
+                    enterApp();
+                    hideLoading();
+                    return;
+                }
+            }
+            hideLoading();
+        });
+        setTimeout(hideLoading, 2000);
+    </script>
+</body>
+
+</html>
