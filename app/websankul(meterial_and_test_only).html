@@ -3798,7 +3798,7 @@ async function loadPdfIntoViewer(pdfUrl, iframeId, loadingId, progressId) {
         }
         const blob = new Blob(chunks, { type: "application/pdf" });
         const blobUrl = URL.createObjectURL(blob);
-        iframe.src = "https://mozilla.github.io/pdf.js/web/viewer.html?file=" + encodeURIComponent(blobUrl);
+        iframe.src = "https://website.cloud-front.in/pdfjs/web/viewer.html?file=" + encodeURIComponent(blobUrl);
         iframe.onload = () => {
             if (loadingEl) loadingEl.remove();
             iframe.style.display = "block";
