@@ -3358,7 +3358,7 @@
                 materials.forEach((m, i) => {
                     const fileUrl = m.file || m.direct_link || "";
                     const fileName = m.name || `File ${i + 1}`;
-                    html += `<div class="lecture-item animate-in" onclick="${fileUrl ? `window.open('${fileUrl.replace(/'/g, "\'")}', '_blank')` : "toast('No file URL')"}" style="cursor:pointer">
+                    html += `<div class="lecture-item animate-in" onclick="${fileUrl ? `openPdfViewer('${fileUrl.replace(/'/g, "\\'")}', '${fileName.replace(/'/g, "\\'")}')` : "toast('No file URL')"}" style="cursor:pointer">
                         <div class="lnum free" style="background:#dbeafe;color:#1d4ed8">📄</div>
                         <div class="linfo"><div class="ltitle">${fileName}</div><div class="lmeta">${fileUrl ? "📎 Click to open/download" : "❌ No file"}</div></div>
                         <span class="lbadge free" style="background:#dbeafe;color:#1d4ed8">PDF</span></div>`;
