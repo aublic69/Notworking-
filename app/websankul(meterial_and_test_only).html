@@ -2996,6 +2996,7 @@
                         <button class="btn btn-sm btn-primary" onclick="openEbookInTab()">🌐 Open in Tab</button>
                         <button class="btn btn-sm btn-success" onclick="downloadEbookPDF('${title.replace(/'/g, "\\'")}')">⬇️ Download PDF</button>
                         <button class="btn btn-sm btn-outline" onclick="copyEbookUrl()">📋 Copy URL</button>
+                         <button class="btn btn-sm btn-outline" onclick="toggleEbookFullscreen()">⛶ Fullscreen</button>
                     </div>
                     <!-- Iframe PDF viewer -->
                     <div style="flex:1;overflow:hidden;position:relative;min-height:400px">
@@ -3052,7 +3053,17 @@
                 }, 3000);
             }
         }
-
+        function toggleEbookFullscreen() {
+    const iframe = document.getElementById("ebook-iframe");
+    if (!iframe) { toast("Viewer not ready", "warning"); return; }
+    if (!document.fullscreenElement) {
+        (iframe.requestFullscreen || iframe.webkitRequestFullscreen || iframe.msRequestFullscreen)
+            ?.call(iframe)
+            .catch(() => toast("Fullscreen not supported", "warning"));
+    } else {
+        document.exitFullscreen?.();
+    }
+}
         function closeEbookModal() {
             const m = document.getElementById("ebook-modal");
             if (m) m.remove();
