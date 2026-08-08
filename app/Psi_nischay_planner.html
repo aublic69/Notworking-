@@ -1247,6 +1247,21 @@
                 display: none
             }
         }
+
+        /* === MOBILE LANDSCAPE FIX === */
+        @media (max-width:900px) and (orientation:landscape) {
+            .folder-layout { flex-direction:column; height:auto; overflow:visible }
+            .player-col { position:relative !important; top:auto !important; flex:none; border-right:none; border-bottom:1px solid var(--border) }
+            .player-wrap { padding-top:0 !important; height:calc(100vh - var(--header-h)) }
+            .player-wrap video { position:relative; width:100%; height:100% }
+            .player-sticky { flex:none; overflow:visible }
+            .player-info { padding:6px 10px }
+            .pp-controls-wrap { bottom:0; z-index:15 }
+            .pp-btn { width:30px; height:30px }
+            .pp-time { font-size:10px; padding:0 3px }
+            .list-col { width:100%; flex:none }
+            .video-list { overflow:visible; padding:8px 12px 60px }
+        }
     
         
         
@@ -1945,6 +1960,8 @@
         let hls = null;
         let currentFolderIdx = -1;
         let currentVideoIdx = -1;
+        let currentFolder = -1;
+        let currentVideo = -1;
 
         function goToHome() { location.reload(); }
         function setSpeed(speed) {
@@ -1980,6 +1997,7 @@
 
         function showFolder(idx) {
             currentFolderIdx = idx;
+            currentFolder = idx;
             const sec = folders[idx];
             document.getElementById('home-page').style.display = 'none';
             const fp = document.getElementById('folder-page');
@@ -1995,7 +2013,7 @@
             sec.urls.forEach((url, i) => {
                 const d = document.createElement('div');
                 d.className = 'video-item';
-                d.id = 'vi_' + i;
+                d.id = 'vi' + i;
                 d.innerHTML = `
       <div class="vnum">${i + 1}</div>
       <div class="vname">Video ${i + 1}</div>
@@ -2015,6 +2033,7 @@
                 el.classList.toggle('active', i === idx);
             });
             currentVideoIdx = idx;
+            currentVideo = idx;
 
             const url = sec.urls[idx];
             document.getElementById('playerTitle').textContent = sec.folder + '  —  Video ' + (idx + 1);
@@ -2048,7 +2067,7 @@
 
             // Scroll active item into view (PC sidebar)
             setTimeout(() => {
-                const item = document.getElementById('vi_' + idx);
+                const item = document.getElementById('vi' + idx);
                 if (item) item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
             }, 80);
         }
@@ -2066,6 +2085,7 @@
             if (hls) { hls.destroy(); hls = null; }
             document.getElementById('mainVideo').src = '';
             currentFolderIdx = -1; currentVideoIdx = -1;
+            currentFolder = -1; currentVideo = -1;
             window.scrollTo(0, 0);
         }
     </script>

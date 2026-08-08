@@ -1240,9 +1240,22 @@
         display: none
       }
     }
-  
-        
-        
+
+    /* === MOBILE LANDSCAPE FIX === */
+    @media (max-width:900px) and (orientation:landscape) {
+      .folder-layout { flex-direction:column; height:auto; overflow:visible }
+      .player-col { position:relative !important; top:auto !important; flex:none; border-right:none; border-bottom:1px solid var(--border) }
+      .player-wrap { padding-top:0 !important; height:calc(100vh - var(--header-h)) }
+      .player-wrap video { position:relative; width:100%; height:100% }
+      .player-sticky { flex:none; overflow:visible }
+      .player-info { padding:6px 10px }
+      .pp-controls-wrap { bottom:0; z-index:15 }
+      .pp-btn { width:30px; height:30px }
+      .pp-time { font-size:10px; padding:0 3px }
+      .list-col { width:100%; flex:none }
+      .video-list { overflow:visible; padding:8px 12px 60px }
+    }
+    
         /* ===== LIGHT THEME COMPLETE STYLING ===== */
         body.light-theme {
             --bg: #f0f2f7;
